@@ -29,6 +29,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jaycefr.gain.ui.theme.GainTheme
+import com.jaycefr.gain.ui.theme.StepCounterScreen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
@@ -36,25 +37,10 @@ import kotlin.coroutines.resume
 
 class MainActivity : ComponentActivity() {
 
-    private val sensorManager : SensorManager by lazy {
-        getSystemService(Context.SENSOR_SERVICE) as SensorManager
-    }
-
-    private val stepCounterSensor : Sensor? by lazy {
-        sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
-    }
-
-    private var stepCount :Long= 0
-
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        sensorManager.registerListener(
-            stepCounterListener,
-            stepCounterSensor,
-            SensorManager.SENSOR_DELAY_NORMAL
-        )
 
         enableEdgeToEdge()
         setContent {
@@ -82,35 +68,9 @@ class MainActivity : ComponentActivity() {
                     Button(onClick = { requestPermission.launch(declined_permissions) }) {
                         Text(text = "Request permission")
                     }
-                    Text(
-                        text = "STEPS : $stepCount"
-                    )
+                    StepCounterScreen()
                 }
             }
         }
     }
-
-    override fun onPause() {
-        sensorManager.unregisterListener(stepCounterListener)
-        super.onPause()
-    }
-
-    val stepCounterListener = object : SensorEventListener {
-        override fun onSensorChanged(event: SensorEvent?) {
-            if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER) {
-                val steps = event.values[0].toLong()
-                Log.d("StepCounter", "Steps: $steps")
-                // Update the step count in your UI or ViewModel
-                stepCount = steps
-                // Handle the step count (e.g., display it in a TextView)
-            }
-        }
-
-        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-            // Handle accuracy changes if needed
-        }
-    }
-
-
-
 }
