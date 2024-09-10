@@ -1,15 +1,7 @@
 package com.jaycefr.gain
 
-import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -21,18 +13,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.room.Room
 import com.jaycefr.gain.ui.theme.GainTheme
-import com.jaycefr.gain.ui.theme.StepCounterScreen
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.resume
 
 
 class MainActivity : ComponentActivity() {
@@ -41,6 +26,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val db = Room.databaseBuilder(
+            applicationContext,
+            StepAppDatabase::class.java, "stepdb"
+        ).build()
+
+        val stepDao = db.stepsDao()
+        val stepRepo = StepsRepo(stepDao)
 
         enableEdgeToEdge()
         setContent {
@@ -68,7 +60,7 @@ class MainActivity : ComponentActivity() {
                     Button(onClick = { requestPermission.launch(declined_permissions) }) {
                         Text(text = "Request permission")
                     }
-                    StepCounterScreen()
+                    StepCounterScreen(stepRepo)
                 }
             }
         }
