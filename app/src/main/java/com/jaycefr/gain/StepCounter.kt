@@ -19,13 +19,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.room.Room
 
 @Composable
-fun StepCounterScreen(stepsRepo: StepsRepo){
+fun StepCounterScreen(
+    todayStepCount : Long,
+    onEvent: (StepsEvent) -> Unit)
+{
     var stepCount by remember {
         mutableStateOf(0L)
-    }
-
-    var count by remember {
-        mutableStateOf(0)
     }
 
     val sensorManager = LocalContext.current.getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -36,6 +35,9 @@ fun StepCounterScreen(stepsRepo: StepsRepo){
             override fun onSensorChanged(event: SensorEvent?) {
                 if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER){
                     stepCount = event.values[0].toLong()
+                    //Store the steps in the db
+                    onEvent(StepsEvent.StoreSteps(stepCount))
+                    onEvent(StepsEvent.LoadTodaySteps)
                 }
             }
 
@@ -53,5 +55,6 @@ fun StepCounterScreen(stepsRepo: StepsRepo){
     }
 
     Text(text = "Step Count : $stepCount")
+    Text(text = "Today Step Count : $todayStepCount")
 
 }

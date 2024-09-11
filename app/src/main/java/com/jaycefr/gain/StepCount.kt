@@ -6,6 +6,7 @@ import androidx.room.Database
 import androidx.room.Delete
 import androidx.room.Entity
 import androidx.room.Insert
+import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.RoomDatabase
 
@@ -13,6 +14,7 @@ import androidx.room.RoomDatabase
 data class StepCount(
     @ColumnInfo(name = "steps") val steps : Long,
     @ColumnInfo(name = "created_at") val createdAt : String,
+    @PrimaryKey(autoGenerate = true) val id : Int = 0
 )
 
 @Dao

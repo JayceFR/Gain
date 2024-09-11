@@ -7,6 +7,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.room.Room
 import com.jaycefr.gain.ui.theme.GainTheme
@@ -33,6 +36,17 @@ class MainActivity : ComponentActivity() {
 
         val stepDao = db.stepsDao()
         val stepRepo = StepsRepo(stepDao)
+
+        val viewModel by viewModels<StepViewModel>(
+            factoryProducer = {
+                object : ViewModelProvider.Factory {
+                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                        return StepViewModel(stepRepo) as T
+                    }
+                }
+            }
+        )
+
 
         enableEdgeToEdge()
         setContent {
@@ -60,7 +74,7 @@ class MainActivity : ComponentActivity() {
                     Button(onClick = { requestPermission.launch(declined_permissions) }) {
                         Text(text = "Request permission")
                     }
-                    StepCounterScreen(stepRepo)
+                    StepCounterScreen(viewModel.stepCount, viewModel::onEvent)
                 }
             }
         }
