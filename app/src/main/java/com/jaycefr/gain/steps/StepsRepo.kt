@@ -1,4 +1,4 @@
-package com.jaycefr.gain
+package com.jaycefr.gain.steps
 
 import android.os.Build
 import android.util.Log
@@ -23,11 +23,14 @@ class StepsRepo (
         stepsDao.insertAll(stepCount)
     }
 
-    suspend fun loadTodaySteps() : Long = withContext(Dispatchers.IO) {
+    suspend fun loadTodaySteps(steps: Long) : Long = withContext(Dispatchers.IO) {
         val todayAtMidnight = (LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).toString())
         val todayDataPoints = stepsDao.loadAllStepsFromToday(todayAtMidnight)
         when{
-            todayDataPoints.isEmpty() -> 0
+            todayDataPoints.isEmpty() -> {
+                storeSteps(steps)
+                0
+            }
             else -> {
                 val firstDataPointOfDay = todayDataPoints.first()
                 val lastDataPointOfDay = todayDataPoints.last()

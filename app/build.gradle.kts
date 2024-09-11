@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.jaycefr.gain"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -78,5 +78,13 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    // For AppWidgets support
+    implementation("androidx.glance:glance:1.1.0")
+
+    // For AppWidgets support
+    implementation("androidx.glance:glance-appwidget:1.1.0")
+
+    // For Wear-Tiles support
+    implementation("androidx.glance:glance-wear-tiles:1.0.0-alpha05")
 
 }

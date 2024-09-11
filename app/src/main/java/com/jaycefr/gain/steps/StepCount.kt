@@ -1,4 +1,4 @@
-package com.jaycefr.gain
+package com.jaycefr.gain.steps
 
 import androidx.room.ColumnInfo
 import androidx.room.Dao

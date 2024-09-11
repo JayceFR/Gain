@@ -20,6 +20,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.room.Room
+import com.jaycefr.gain.steps.StepAppDatabase
+import com.jaycefr.gain.steps.StepCounterScreen
+import com.jaycefr.gain.steps.StepViewModel
+import com.jaycefr.gain.steps.StepsRepo
 import com.jaycefr.gain.ui.theme.GainTheme
 
 
