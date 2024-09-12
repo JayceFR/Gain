@@ -1,0 +1,101 @@
+package com.jaycefr.gain.steps
+
+import android.annotation.SuppressLint
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Intent
+import android.os.IBinder
+import android.app.Service
+import android.content.Context
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
+import android.os.Build
+import android.util.Log
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.NotificationCompat
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.room.Room
+import com.jaycefr.gain.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlin.properties.Delegates
+
+class StepForegroundService : Service() {
+
+    private lateinit var sensorManager: SensorManager
+    private var stepCounterSensor: Sensor? = null
+    private lateinit var db : StepAppDatabase
+    private lateinit var stepsRepo: StepsRepo
+    private val serviceJob = Job()
+    private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
+
+    override fun onBind(intent: Intent?): IBinder? {
+        return null
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        when(intent?.action){
+            Actions.START.toString() -> start()
+            Actions.STOP.toString() -> stop()
+        }
+        return super.onStartCommand(intent, flags, startId)
+    }
+
+    @SuppressLint("ForegroundServiceType")
+    private fun start(){
+        val notification = NotificationCompat.Builder(this, "running_channel")
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContentTitle("Run is active")
+            .setContentText("Elapsed time : 00:50")
+            .build()
+        startForeground(1, notification)
+
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+
+        val stepCountListener = object : SensorEventListener{
+            override fun onSensorChanged(event: SensorEvent?) {
+                if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER){
+                    val stepCount = event.values[0].toLong()
+                    serviceScope.launch {
+                        stepsRepo.storeSteps(stepCount)
+                        Log.d("Steps", "Storing Steps : $stepCount")
+                        StepViewModelLinker.updateStepCount(stepsRepo.loadTodaySteps())
+                    }
+                }
+            }
+
+            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+
+            }
+        }
+
+        db = Room.databaseBuilder(
+            applicationContext,
+            StepAppDatabase::class.java, "stepdb"
+        ).build()
+
+        stepsRepo = StepsRepo(db.stepsDao())
+
+        sensorManager.registerListener(stepCountListener, stepCounterSensor, SensorManager.SENSOR_DELAY_UI)
+
+    }
+
+    private fun stop(){
+        stopSelf()
+    }
+
+}
+
+enum class Actions{
+    START, STOP
+}

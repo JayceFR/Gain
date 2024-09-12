@@ -1,6 +1,9 @@
 package com.jaycefr.gain.steps
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -11,56 +14,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
 @Composable
-fun StepCounterScreen(
-    todayStepCount : Long,
-    onEvent: (StepsEvent) -> Unit)
+fun StepCounterScreen(stepViewModel: StepViewModel)
 {
-    var stepCount by remember {
-        mutableStateOf(0L)
-    }
 
-    val sensorManager = LocalContext.current.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-    val stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+    val stepCount by stepViewModel.stepCount.collectAsState()
 
-    DisposableEffect(key1 = stepCounterSensor) {
-        val stepCounterListener = object : SensorEventListener{
-            override fun onSensorChanged(event: SensorEvent?) {
-                if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER){
-                    stepCount = event.values[0].toLong()
-                    //Store the steps in the db
-                    onEvent(StepsEvent.StoreSteps(stepCount))
-                    //Increment today's step count
-                    onEvent(StepsEvent.LoadTodaySteps(stepCount))
-
-                }
-            }
-
-            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-                Log.d("StepCounter", "Accuracy Changed")
-            }
-        }
-
-
-        sensorManager.registerListener(
-            stepCounterListener,
-            stepCounterSensor,
-            SensorManager.SENSOR_DELAY_UI
-        )
-
-        onDispose {
-            sensorManager.unregisterListener(stepCounterListener)
-        }
-
-    }
-
-    Text(text = "Step Count : $stepCount")
-    Text(text = "Today Step Count : $todayStepCount")
+    Text(text = "Today Step Count : $stepCount")
 
 }

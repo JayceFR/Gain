@@ -86,5 +86,6 @@ dependencies {
 
     // For Wear-Tiles support
     implementation("androidx.glance:glance-wear-tiles:1.0.0-alpha05")
+    implementation("androidx.localbroadcastmanager:localbroadcastmanager:1.1.0")
 
 }

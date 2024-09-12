@@ -1,19 +1,23 @@
 package com.jaycefr.gain.steps
 
+import android.content.Context
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.MutableState
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import kotlin.coroutines.coroutineContext
 
 class StepsRepo (
     private val stepsDao: StepsDao
 ) {
-    @RequiresApi(Build.VERSION_CODES.O)
     suspend fun storeSteps(steps: Long) = withContext(Dispatchers.IO) {
         val stepCount = StepCount(
             steps = steps,
@@ -23,12 +27,11 @@ class StepsRepo (
         stepsDao.insertAll(stepCount)
     }
 
-    suspend fun loadTodaySteps(steps: Long) : Long = withContext(Dispatchers.IO) {
+    suspend fun loadTodaySteps() : Long = withContext(Dispatchers.IO) {
         val todayAtMidnight = (LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).toString())
         val todayDataPoints = stepsDao.loadAllStepsFromToday(todayAtMidnight)
         when{
             todayDataPoints.isEmpty() -> {
-                storeSteps(steps)
                 0
             }
             else -> {
@@ -39,5 +42,16 @@ class StepsRepo (
             }
         }
     }
+
+}
+
+object StepViewModelLinker{
+    private val _stepCount = MutableStateFlow(0L)
+    val stepCount : MutableStateFlow<Long> get() = _stepCount
+
+    fun updateStepCount(count : Long){
+        _stepCount.value = count
+    }
+
 
 }
