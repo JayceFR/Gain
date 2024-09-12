@@ -52,6 +52,4 @@ object StepViewModelLinker{
     fun updateStepCount(count : Long){
         _stepCount.value = count
     }
-
-
 }
