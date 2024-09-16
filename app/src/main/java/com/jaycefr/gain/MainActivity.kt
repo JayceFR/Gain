@@ -14,13 +14,21 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -48,14 +56,6 @@ class MainActivity : ComponentActivity() {
                 0
             )
         }
-
-//        val db = Room.databaseBuilder(
-//            applicationContext,
-//            StepAppDatabase::class.java, "stepdb"
-//        ).build()
-
-//        val stepDao = db.stepsDao()
-//        val stepRepo = StepsRepo(stepDao)
 
         val viewModel by viewModels<StepViewModel>(
             factoryProducer = {
@@ -88,17 +88,39 @@ class MainActivity : ComponentActivity() {
                 val declined_permissions = permissionViewModel.permission_health_checker(baseContext)
 
                 Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            brush = Brush.linearGradient(
+                                colors = listOf(
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                    MaterialTheme.colorScheme.background
+                                ),
+                                start = Offset.Zero,
+                                end = Offset(0f, 1000f)
+                            )
+                        )
+                    ,
+//                    verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    Spacer(modifier = Modifier.height(38.dp))
+
+                    Text(
+                        text="Home",
+                        fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                        fontFamily = MaterialTheme.typography.titleMedium.fontFamily,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer
+                    )
+
+                    StepCounterScreen(viewModel)
+                    Spacer(modifier = Modifier.height(80.dp))
                     Text(
                         text = "Hello World!",
                     )
                     Button(onClick = { requestPermission.launch(declined_permissions) }) {
                         Text(text = "Request permission")
                     }
-                    StepCounterScreen(viewModel)
                 }
             }
         }

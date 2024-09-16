@@ -10,6 +10,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -28,6 +29,10 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
 
     val stepCount by stepViewModel.stepCount.collectAsState()
 
-    Text(text = "Today Step Count : $stepCount")
+    Text(
+        text = "$stepCount",
+        color = MaterialTheme.colorScheme.onTertiaryContainer,
+        fontSize = MaterialTheme.typography.displayLarge.fontSize
+    )
 
 }
