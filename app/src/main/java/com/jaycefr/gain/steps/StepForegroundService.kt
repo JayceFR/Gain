@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.IBinder
 import android.app.Service
+import android.content.ComponentName
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -36,15 +37,15 @@ class StepForegroundService : Service() {
             Actions.START.toString() -> start()
             Actions.STOP.toString() -> stop()
         }
-        return super.onStartCommand(intent, flags, startId)
+        return START_STICKY
     }
-
+    
     @SuppressLint("ForegroundServiceType")
     private fun start(){
         val notification = NotificationCompat.Builder(this, "running_channel")
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle("Gain")
-            .setSubText("Counting Text")
+            .setSubText("Tracking Steps")
             .build()
         startForeground(1, notification)
 

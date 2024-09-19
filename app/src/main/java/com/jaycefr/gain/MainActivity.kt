@@ -15,16 +15,22 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -52,7 +58,7 @@ class MainActivity : ComponentActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
             ActivityCompat.requestPermissions(
                 this,
-                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                arrayOf(Manifest.permission.POST_NOTIFICATIONS, Manifest.permission.RECEIVE_BOOT_COMPLETED),
                 0
             )
         }
@@ -66,6 +72,8 @@ class MainActivity : ComponentActivity() {
                 }
             }
         )
+
+        val homeViewModel = HomeViewModel()
 
         Intent(applicationContext, StepForegroundService::class.java).also {
             it.action = Actions.START.toString()
@@ -91,14 +99,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier
                         .fillMaxSize()
                         .background(
-                            brush = Brush.linearGradient(
-                                colors = listOf(
-                                    MaterialTheme.colorScheme.tertiaryContainer,
-                                    MaterialTheme.colorScheme.background
-                                ),
-                                start = Offset.Zero,
-                                end = Offset(0f, 1000f)
-                            )
+                            color = MaterialTheme.colorScheme.background
                         )
                     ,
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -112,11 +113,20 @@ class MainActivity : ComponentActivity() {
                         color = MaterialTheme.colorScheme.onTertiaryContainer
                     )
 
-                    StepCounterScreen(viewModel)
-                    Spacer(modifier = Modifier.height(80.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
+
                     Text(
-                        text = "Hello World!",
+                        text = "${homeViewModel.getGreetingMessage()} Jayce",
+                        fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                        fontFamily = MaterialTheme.typography.titleMedium.fontFamily,
+                        color = MaterialTheme.colorScheme.onBackground
                     )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+                    
+                    StepCounterScreen(stepViewModel = viewModel)
+                    
+                    Spacer(modifier = Modifier.height(80.dp))
                     Button(onClick = { requestPermission.launch(declined_permissions) }) {
                         Text(text = "Request permission")
                     }

@@ -15,7 +15,7 @@ class PermissionManagerViewModel() : ViewModel(){
     @RequiresApi(Build.VERSION_CODES.Q)
     public val permissionList = mutableStateListOf(
         android.Manifest.permission.ACTIVITY_RECOGNITION,
-
+        Manifest.permission.RECEIVE_BOOT_COMPLETED,
     )
 
     private val grantedPermissions = mutableStateListOf<String>()
