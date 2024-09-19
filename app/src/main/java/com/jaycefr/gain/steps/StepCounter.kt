@@ -22,12 +22,28 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.room.Room
 
 @Composable
 fun StepCounterScreen(stepViewModel: StepViewModel)
 {
 
+    var db by remember { mutableStateOf<StepAppDatabase?>(null) }
+    var stepsRepo by remember { mutableStateOf<StepsRepo?>(null) }
+
     val stepCount by stepViewModel.stepCount.collectAsState()
+    val context : Context = LocalContext.current
+    LaunchedEffect(context) {
+        db = Room.databaseBuilder(
+            context,
+            StepAppDatabase::class.java, "stepdb"
+        ).build()
+
+        stepsRepo = StepsRepo(db!!.stepsDao())
+
+        StepViewModelLinker.updateStepCount(stepsRepo!!.loadTodaySteps())
+
+    }
 
     Text(
         text = "$stepCount",

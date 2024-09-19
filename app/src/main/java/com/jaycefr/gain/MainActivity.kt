@@ -101,7 +101,6 @@ class MainActivity : ComponentActivity() {
                             )
                         )
                     ,
-//                    verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Spacer(modifier = Modifier.height(38.dp))

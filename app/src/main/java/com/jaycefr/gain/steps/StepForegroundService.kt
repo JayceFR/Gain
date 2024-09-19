@@ -43,7 +43,8 @@ class StepForegroundService : Service() {
     private fun start(){
         val notification = NotificationCompat.Builder(this, "running_channel")
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("I am watching you 👁️")
+            .setContentTitle("Gain")
+            .setSubText("Counting Text")
             .build()
         startForeground(1, notification)
 

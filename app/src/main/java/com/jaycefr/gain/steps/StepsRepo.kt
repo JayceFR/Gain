@@ -32,12 +32,20 @@ class StepsRepo (
         val todayDataPoints = stepsDao.loadAllStepsFromToday(todayAtMidnight)
         when{
             todayDataPoints.isEmpty() -> {
+                println("No data points found for today")
+                Log.d("Steps", "found no datapoints for today")
                 0
             }
             else -> {
-                val firstDataPointOfDay = todayDataPoints.first()
-                val lastDataPointOfDay = todayDataPoints.last()
-                val todaySteps = lastDataPointOfDay.steps - firstDataPointOfDay.steps
+                // Ignore the reboot
+                var todaySteps = 0L
+                println("Data points found today")
+                Log.d("Steps", "found data points today")
+                for (x in todayDataPoints.size - 1 downTo 1){
+                    if (todayDataPoints[x].steps > todayDataPoints[x-1].steps){
+                        todaySteps += todayDataPoints[x].steps - todayDataPoints[x-1].steps
+                    }
+                }
                 todaySteps
             }
         }
