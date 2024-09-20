@@ -15,6 +15,15 @@ class StepViewModel() : ViewModel() {
 //    var stepCount by mutableLongStateOf(0L)
 
     val stepCount : StateFlow<Long> get() = StepViewModelLinker.stepCount
+    private val _lastupdate = MutableStateFlow("");
+    val lastupdate : StateFlow<String> get() = _lastupdate
 
+    fun updateLastUpdate(update: String){
+        _lastupdate.value = update
+    }
+}
 
+enum class GifState{
+    Standing,
+    Walking
 }

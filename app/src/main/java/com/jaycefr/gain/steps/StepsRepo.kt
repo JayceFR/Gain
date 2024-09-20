@@ -51,6 +51,12 @@ class StepsRepo (
         }
     }
 
+    suspend fun getLastStepUpdate() : String = withContext(Dispatchers.IO) {
+        val todayAtMidnight = (LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).toString())
+        val todayDataPoints = stepsDao.loadAllStepsFromToday(todayAtMidnight)
+        todayDataPoints.last().createdAt
+    }
+
 }
 
 object StepViewModelLinker{

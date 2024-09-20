@@ -1,9 +1,6 @@
 package com.jaycefr.gain
 
 import android.Manifest
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -15,37 +12,33 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.room.Room
+import coil.ImageLoader
+import coil.compose.AsyncImage
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
+import coil.request.ImageRequest
 import com.jaycefr.gain.steps.Actions
-import com.jaycefr.gain.steps.StepAppDatabase
 import com.jaycefr.gain.steps.StepCounterScreen
 import com.jaycefr.gain.steps.StepForegroundService
 import com.jaycefr.gain.steps.StepViewModel
-import com.jaycefr.gain.steps.StepsRepo
 import com.jaycefr.gain.ui.theme.GainTheme
 
 
@@ -79,6 +72,21 @@ class MainActivity : ComponentActivity() {
             it.action = Actions.START.toString()
             startService(it)
         }
+
+        val gifloader = ImageLoader.Builder(applicationContext)
+            .components {
+                if (Build.VERSION.SDK_INT >= 28) {
+                    add(ImageDecoderDecoder.Factory())
+                } else {
+                    add(GifDecoder.Factory())
+                }
+            }
+            .build()
+
+        val request = ImageRequest.Builder(applicationContext)
+            .data(R.drawable.standing)
+            .size(coil.size.Size.ORIGINAL)
+            .build()
 
         enableEdgeToEdge()
         setContent {
@@ -127,6 +135,18 @@ class MainActivity : ComponentActivity() {
                     StepCounterScreen(stepViewModel = viewModel)
                     
                     Spacer(modifier = Modifier.height(80.dp))
+
+                    AsyncImage(
+                        model = request,
+                        contentDescription = null ,
+                        imageLoader = gifloader,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .width(200.dp)
+                            .height(200.dp)
+                            .clip(CircleShape)
+                    )
+
                     Button(onClick = { requestPermission.launch(declined_permissions) }) {
                         Text(text = "Request permission")
                     }

@@ -45,6 +45,7 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
     var stepsRepo by remember { mutableStateOf<StepsRepo?>(null) }
 
     val stepCount by stepViewModel.stepCount.collectAsState()
+    val lastUpdate by stepViewModel.lastupdate.collectAsState()
     val context : Context = LocalContext.current
     LaunchedEffect(context) {
         db = Room.databaseBuilder(
@@ -54,6 +55,7 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
 
         stepsRepo = StepsRepo(db!!.stepsDao())
 
+        stepViewModel.updateLastUpdate(stepsRepo!!.getLastStepUpdate())
         StepViewModelLinker.updateStepCount(stepsRepo!!.loadTodaySteps())
 
     }
@@ -102,6 +104,11 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
 
         Text(
             text = "Distance Covered",
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            fontSize = MaterialTheme.typography.titleMedium.fontSize
+        )
+        Text(
+            text = "Last updated: $lastUpdate",
             color = MaterialTheme.colorScheme.onPrimaryContainer,
             fontSize = MaterialTheme.typography.titleMedium.fontSize
         )

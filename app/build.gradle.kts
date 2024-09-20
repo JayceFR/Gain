@@ -87,5 +87,9 @@ dependencies {
     // For Wear-Tiles support
     implementation("androidx.glance:glance-wear-tiles:1.0.0-alpha05")
     implementation("androidx.localbroadcastmanager:localbroadcastmanager:1.1.0")
+    implementation("io.coil-kt:coil-gif:2.7.0")
+    implementation("io.coil-kt:coil-compose:2.7.0")
+
+
 
 }
