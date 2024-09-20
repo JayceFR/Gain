@@ -54,7 +54,22 @@ class StepsRepo (
     suspend fun getLastStepUpdate() : String = withContext(Dispatchers.IO) {
         val todayAtMidnight = (LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).toString())
         val todayDataPoints = stepsDao.loadAllStepsFromToday(todayAtMidnight)
-        todayDataPoints.last().createdAt
+        when{
+            todayDataPoints.isEmpty() -> {
+                println("empty")
+                Instant.now().toString()
+            }
+            else -> {
+                var ans = todayDataPoints.first().createdAt;
+                for (x in 0..todayDataPoints.size - 2){
+                    if(todayDataPoints[x].steps != todayDataPoints[x+1].steps){
+                        ans = todayDataPoints[x+1].createdAt;
+                    }
+                }
+                ans
+            }
+        }
+
     }
 
 }
