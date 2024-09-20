@@ -73,20 +73,7 @@ class MainActivity : ComponentActivity() {
             startService(it)
         }
 
-        val gifloader = ImageLoader.Builder(applicationContext)
-            .components {
-                if (Build.VERSION.SDK_INT >= 28) {
-                    add(ImageDecoderDecoder.Factory())
-                } else {
-                    add(GifDecoder.Factory())
-                }
-            }
-            .build()
 
-        val request = ImageRequest.Builder(applicationContext)
-            .data(R.drawable.standing)
-            .size(coil.size.Size.ORIGINAL)
-            .build()
 
         enableEdgeToEdge()
         setContent {
@@ -136,16 +123,7 @@ class MainActivity : ComponentActivity() {
                     
                     Spacer(modifier = Modifier.height(80.dp))
 
-                    AsyncImage(
-                        model = request,
-                        contentDescription = null ,
-                        imageLoader = gifloader,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .width(200.dp)
-                            .height(200.dp)
-                            .clip(CircleShape)
-                    )
+
 
                     Button(onClick = { requestPermission.launch(declined_permissions) }) {
                         Text(text = "Request permission")

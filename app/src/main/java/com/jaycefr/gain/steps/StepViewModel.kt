@@ -18,9 +18,17 @@ class StepViewModel() : ViewModel() {
     private val _lastupdate = MutableStateFlow("");
     val lastupdate : StateFlow<String> get() = _lastupdate
 
+    private val _gifState = MutableStateFlow(GifState.Standing)
+    val gifState : StateFlow<GifState> get() = _gifState
+
     fun updateLastUpdate(update: String){
         _lastupdate.value = update
     }
+
+    fun updateGifState(state: GifState){
+        _gifState.value = state
+    }
+
 }
 
 enum class GifState{
