@@ -60,6 +60,8 @@ class StepForegroundService : Service() {
                         stepsRepo.storeSteps(stepCount)
                         Log.d("Steps", "Storing Steps : $stepCount")
                         StepViewModelLinker.updateStepCount(stepsRepo.loadTodaySteps())
+                        //update the gifstate
+                        StepViewModelLinker.updateGifState(GifState.Walking)
                         //update the widget
                         StepWidget.updateAll(applicationContext)
                     }

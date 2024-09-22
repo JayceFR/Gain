@@ -8,6 +8,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.runtime.MutableState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.LocalDate
@@ -78,7 +79,14 @@ object StepViewModelLinker{
     private val _stepCount = MutableStateFlow(0L)
     val stepCount : MutableStateFlow<Long> get() = _stepCount
 
+    private val _gifState = MutableStateFlow(GifState.Standing)
+    val gifState : StateFlow<GifState> get() = _gifState
+
     fun updateStepCount(count : Long){
         _stepCount.value = count
+    }
+
+    fun updateGifState(state: GifState){
+        _gifState.value = state
     }
 }

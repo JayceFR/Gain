@@ -11,20 +11,40 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
@@ -74,7 +94,6 @@ class MainActivity : ComponentActivity() {
         }
 
 
-
         enableEdgeToEdge()
         setContent {
             GainTheme {
@@ -93,42 +112,18 @@ class MainActivity : ComponentActivity() {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(
-                            color = MaterialTheme.colorScheme.background
-                        )
-                    ,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Spacer(modifier = Modifier.height(38.dp))
+                        .background(MaterialTheme.colorScheme.background),
 
-                    Text(
-                        text="Home",
-                        fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                        fontFamily = MaterialTheme.typography.titleMedium.fontFamily,
-                        color = MaterialTheme.colorScheme.onTertiaryContainer
-                    )
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    Text(
-                        text = "${homeViewModel.getGreetingMessage()} Jayce",
-                        fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                        fontFamily = MaterialTheme.typography.titleMedium.fontFamily,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-
-                    Spacer(modifier = Modifier.height(20.dp))
-                    
+                ){
                     StepCounterScreen(stepViewModel = viewModel)
-                    
+
                     Spacer(modifier = Modifier.height(80.dp))
-
-
 
                     Button(onClick = { requestPermission.launch(declined_permissions) }) {
                         Text(text = "Request permission")
                     }
                 }
+
             }
         }
     }

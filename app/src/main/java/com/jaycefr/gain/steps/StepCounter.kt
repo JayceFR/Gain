@@ -8,18 +8,32 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.media.Image
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -33,10 +47,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.draw.paint
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.room.Room
@@ -60,6 +83,15 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
 
     val gifState by stepViewModel.gifState.collectAsState()
 
+    var colors = mutableListOf<Color>()
+
+    if (!isSystemInDarkTheme()){
+        colors = mutableListOf(Color(132, 255, 201), Color(170, 178, 255), Color(236, 160, 255))
+    }
+    else{
+        colors = mutableListOf(Color(14, 7, 3), Color(42, 69, 75), Color(41, 72, 97))
+    }
+
     val context : Context = LocalContext.current
     LaunchedEffect(context) {
         db = Room.databaseBuilder(
@@ -75,66 +107,12 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
         val last_update = Instant.parse(lastUpdate)
         val current_time = Instant.now().minusSeconds(300)
         if (last_update.isBefore(current_time)){
-            stepViewModel.updateGifState(GifState.Standing)
+            StepViewModelLinker.updateGifState(GifState.Standing)
         } else{
-            stepViewModel.updateGifState(GifState.Walking)
+            StepViewModelLinker.updateGifState(GifState.Walking)
         }
 
 
-    }
-    Column(
-        modifier = Modifier
-            .height(150.dp)
-            .fillMaxWidth(0.85f)
-            .clip(shape = RoundedCornerShape(15.dp))
-            .shadow(elevation = 4.dp)
-            .background(color = MaterialTheme.colorScheme.primaryContainer),
-
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-
-        ){
-        Text(
-            text = "$stepCount",
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
-            fontSize = MaterialTheme.typography.displayLarge.fontSize
-        )
-
-        Text(
-            text = "Steps Taken",
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
-            fontSize = MaterialTheme.typography.titleMedium.fontSize
-        )
-    }
-    Spacer(modifier = Modifier.height(20.dp))
-    Column(
-        modifier = Modifier
-            .height(150.dp)
-            .fillMaxWidth(0.85f)
-            .clip(shape = RoundedCornerShape(15.dp))
-            .shadow(elevation = 4.dp)
-            .background(color = MaterialTheme.colorScheme.primaryContainer),
-
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-
-        ){
-        Text(
-            text = "${(stepCount * 0.762).toInt()}m",
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
-            fontSize = MaterialTheme.typography.displayLarge.fontSize
-        )
-
-        Text(
-            text = "Distance Covered",
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
-            fontSize = MaterialTheme.typography.titleMedium.fontSize
-        )
-        Text(
-            text = "Last updated: $lastUpdate",
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
-            fontSize = MaterialTheme.typography.titleMedium.fontSize
-        )
     }
 
     val gifloader = ImageLoader.Builder(LocalContext.current)
@@ -149,38 +127,133 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
 
     val request = ImageRequest.Builder(LocalContext.current)
         .data(R.drawable.standing)
-        .size(coil.size.Size.ORIGINAL)
+        .size(480, 480)
         .build()
 
     val walking_request = ImageRequest.Builder(LocalContext.current)
         .data(R.drawable.walking)
-        .size(coil.size.Size.ORIGINAL)
+        .size(480, 480)
         .build()
 
-    if (gifState.toString() == GifState.Standing.toString()){
-        AsyncImage(
-            model = request,
-            contentDescription = null ,
-            imageLoader = gifloader,
-            contentScale = ContentScale.Crop,
+    Column (
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        Box(
             modifier = Modifier
-                .width(200.dp)
-                .height(200.dp)
-                .clip(CircleShape)
-        )
-    }
-    else{
-        AsyncImage(
-            model = walking_request,
-            contentDescription = null ,
-            imageLoader = gifloader,
-            contentScale = ContentScale.Crop,
+                .height(300.dp)
+
+        ){
+            val infiniteTransition = rememberInfiniteTransition(label = "background")
+            val targetOffset = with(LocalDensity.current){
+                1000.dp.toPx()
+            }
+            val offset by infiniteTransition.animateFloat(
+                initialValue = 0f,
+                targetValue = targetOffset,
+                animationSpec = infiniteRepeatable(
+                    tween(50000, easing = LinearEasing),
+                    repeatMode = RepeatMode.Reverse),
+                label = "offset"
+            )
+            val brush = Brush.linearGradient(
+                colors = colors,
+                start = Offset(offset, offset),
+                end = Offset(offset - 400f, offset - 400f),
+                tileMode = TileMode.Repeated
+            )
+            Spacer(
+                modifier = Modifier
+                    .fillMaxHeight(0.8f)
+                    .fillMaxWidth()
+                    .blur(15.dp)
+                    .paint(
+                        painterResource(id = R.drawable.hexagon),
+                        contentScale = ContentScale.FillBounds
+                    )
+//                    .drawWithCache {
+//                        onDrawBehind { drawRect(brush) }
+//                    }
+            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
+                Box(
+                    modifier = Modifier
+                        .offset(y = 180.dp)
+                        .clip(CircleShape)
+                        .size(100.dp)
+                ){
+                    AsyncImage(
+                        model = if (gifState.toString() == GifState.Walking.toString()) walking_request else request,
+                        contentDescription = null ,
+                        imageLoader = gifloader,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(CircleShape)
+                    )
+                }
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(190.dp))
+
+        Column(
             modifier = Modifier
-                .width(200.dp)
-                .height(200.dp)
-                .clip(CircleShape)
-        )
+                .height(150.dp)
+                .fillMaxWidth(0.85f)
+                .clip(shape = RoundedCornerShape(15.dp))
+                .shadow(elevation = 4.dp)
+                .background(color = MaterialTheme.colorScheme.primaryContainer),
+
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+
+            Text(
+                text = "$stepCount",
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                fontSize = MaterialTheme.typography.displayLarge.fontSize
+            )
+
+            Text(
+                text = "Steps Taken",
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                fontSize = MaterialTheme.typography.titleMedium.fontSize
+            )
+        }
+        Spacer(modifier = Modifier.height(20.dp))
+        Column(
+            modifier = Modifier
+                .height(150.dp)
+                .fillMaxWidth(0.85f)
+                .clip(shape = RoundedCornerShape(15.dp))
+                .shadow(elevation = 4.dp)
+                .background(color = MaterialTheme.colorScheme.primaryContainer),
+
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+
+            ){
+            Text(
+                text = "${(stepCount * 0.762).toInt()}m",
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                fontSize = MaterialTheme.typography.displayLarge.fontSize
+            )
+
+            Text(
+                text = "Distance Covered",
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                fontSize = MaterialTheme.typography.titleMedium.fontSize
+            )
+        }
+
     }
+
+
 
 
 
