@@ -140,24 +140,6 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
         .size(480, 480)
         .build()
 
-    val infiniteTransition = rememberInfiniteTransition(label = "background")
-    val targetOffset = with(LocalDensity.current){
-        1000.dp.toPx()
-    }
-    val offset by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = targetOffset,
-        animationSpec = infiniteRepeatable(
-            tween(50000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse),
-        label = "offset"
-    )
-    val brush = Brush.linearGradient(
-        colors = colors,
-        start = Offset(offset, offset),
-        end = Offset(offset + 500, offset + 500),
-        tileMode = TileMode.Mirror
-    )
     val permissionViewModel = viewModel<PermissionManagerViewModel>()
     val requestPermission = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(), onResult = {
@@ -176,38 +158,6 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-//        Box(
-//            modifier = Modifier
-//                .height(300.dp)
-//
-//        ){
-//
-//            Column(
-//                modifier = Modifier
-//                    .fillMaxSize(),
-//                horizontalAlignment = Alignment.CenterHorizontally
-//            ){
-//                Box(
-//                    modifier = Modifier
-//                        .offset(y = 180.dp)
-//                        .clip(CircleShape)
-//                        .size(100.dp)
-//                ){
-//                    AsyncImage(
-//                        model = if (gifState.toString() == GifState.Walking.toString()) walking_request else request,
-//                        contentDescription = null ,
-//                        imageLoader = gifloader,
-//                        contentScale = ContentScale.FillBounds
-//
-//                        ,
-//                        modifier = Modifier
-//                            .fillMaxSize()
-//                            .clip(CircleShape)
-//                    )
-//                }
-//            }
-//        }
-        
         Spacer(modifier = Modifier.height(90.dp))
 
         CircularProgressBar(percentage = stepPercentage, number = stepCount)
