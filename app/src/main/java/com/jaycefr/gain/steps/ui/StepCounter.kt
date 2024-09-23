@@ -65,6 +65,7 @@ import com.jaycefr.gain.steps.data.StepAppDatabase
 import com.jaycefr.gain.steps.data.StepViewModel
 import com.jaycefr.gain.steps.data.StepViewModelLinker
 import com.jaycefr.gain.steps.data.StepsRepo
+import com.jaycefr.gain.steps.utils.getDecimalPlace
 import java.time.Instant
 
 @RequiresApi(Build.VERSION_CODES.Q)
@@ -185,7 +186,6 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
             modifier = Modifier
                 .height(40.dp)
                 .fillMaxWidth(0.9f)
-//                .background(Color.Gray)
         ) {
 
             LinearProgressIndicator(
@@ -237,7 +237,7 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
             Text(
                 text = "${(stepCount * 0.762).toInt()}m",
                 color = MaterialTheme.colorScheme.onBackground,
-                fontSize = MaterialTheme.typography.displayLarge.fontSize
+                fontSize = MaterialTheme.typography.displayMedium.fontSize
             )
 
             Text(
@@ -247,17 +247,38 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
             )
         }
 
+        Spacer(modifier = Modifier.height(20.dp))
+        Column(
+            modifier = Modifier
+                .height(150.dp)
+                .fillMaxWidth(0.85f)
+                .clip(shape = RoundedCornerShape(15.dp))
+                .shadow(elevation = 4.dp)
+                .background(color = MaterialTheme.colorScheme.primaryContainer),
+
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+
+            ){
+            Text(
+                text = "${getDecimalPlace(stepCount * 0.033f)}kcal",
+                color = MaterialTheme.colorScheme.onBackground,
+                fontSize = MaterialTheme.typography.displayMedium.fontSize
+            )
+
+            Text(
+                text = "Calories Burned",
+                color = MaterialTheme.colorScheme.onSecondary,
+                fontSize = MaterialTheme.typography.titleMedium.fontSize
+            )
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
 
         Button(onClick = { requestPermission.launch(declined_permissions) }) {
             Text(text = "Request permission")
         }
 
     }
-
-
-
-
-
-
 
 }
