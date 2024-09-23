@@ -97,17 +97,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             GainTheme {
-                val permissionViewModel = viewModel<PermissionManagerViewModel>()
-                val requestPermission = rememberLauncherForActivityResult(
-                    contract = ActivityResultContracts.RequestMultiplePermissions(), onResult = {
-                        permmap ->
-                        permmap.keys.forEach {
-                            permission ->
-                            permissionViewModel.notify_permission_granted(permission, permmap[permission] == true, baseContext)
-                        }
-                    })
-                //Handling permissions
-                val declined_permissions = permissionViewModel.permission_health_checker(baseContext)
+
 
                 Column(
                     modifier = Modifier
@@ -117,11 +107,7 @@ class MainActivity : ComponentActivity() {
                 ){
                     StepCounterScreen(stepViewModel = viewModel)
 
-                    Spacer(modifier = Modifier.height(80.dp))
-
-                    Button(onClick = { requestPermission.launch(declined_permissions) }) {
-                        Text(text = "Request permission")
-                    }
+//                    Spacer(modifier = Modifier.height(80.dp))
                 }
 
             }

@@ -12,6 +12,9 @@ import android.media.Image
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -30,11 +33,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,8 +55,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.draw.shadow
@@ -61,6 +71,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.room.Room
 import coil.ImageLoader
@@ -68,9 +79,11 @@ import coil.compose.AsyncImage
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
+import com.jaycefr.gain.PermissionManagerViewModel
 import com.jaycefr.gain.R
 import java.time.Instant
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun StepCounterScreen(stepViewModel: StepViewModel)
 {
@@ -86,10 +99,13 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
     var colors = mutableListOf<Color>()
 
     if (!isSystemInDarkTheme()){
-        colors = mutableListOf(Color(132, 255, 201), Color(170, 178, 255), Color(236, 160, 255))
+        colors = mutableListOf(
+            Color(185, 212, 220, 100),
+            Color(200, 227, 233, 100),
+            Color(215, 240, 252, 100))
     }
     else{
-        colors = mutableListOf(Color(14, 7, 3), Color(42, 69, 75), Color(41, 72, 97))
+        colors = mutableListOf(Color(27, 54, 66, 100), Color(42, 69, 75, 100), Color(41, 72, 97, 100))
     }
 
     val context : Context = LocalContext.current
@@ -135,46 +151,62 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
         .size(480, 480)
         .build()
 
+    val infiniteTransition = rememberInfiniteTransition(label = "background")
+    val targetOffset = with(LocalDensity.current){
+        1000.dp.toPx()
+    }
+    val offset by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = targetOffset,
+        animationSpec = infiniteRepeatable(
+            tween(50000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse),
+        label = "offset"
+    )
+    val brush = Brush.linearGradient(
+        colors = colors,
+        start = Offset(offset, offset),
+        end = Offset(offset + 500, offset + 500),
+        tileMode = TileMode.Mirror
+    )
+    val permissionViewModel = viewModel<PermissionManagerViewModel>()
+    val requestPermission = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(), onResult = {
+                permmap ->
+            permmap.keys.forEach {
+                    permission ->
+                permissionViewModel.notify_permission_granted(permission, permmap[permission] == true, context)
+            }
+        })
+    //Handling permissions
+    val declined_permissions = permissionViewModel.permission_health_checker(LocalContext.current)
+
     Column (
         modifier = Modifier
             .fillMaxSize()
+            .background(brush),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
         Box(
             modifier = Modifier
                 .height(300.dp)
 
         ){
-            val infiniteTransition = rememberInfiniteTransition(label = "background")
-            val targetOffset = with(LocalDensity.current){
-                1000.dp.toPx()
-            }
-            val offset by infiniteTransition.animateFloat(
-                initialValue = 0f,
-                targetValue = targetOffset,
-                animationSpec = infiniteRepeatable(
-                    tween(50000, easing = LinearEasing),
-                    repeatMode = RepeatMode.Reverse),
-                label = "offset"
-            )
-            val brush = Brush.linearGradient(
-                colors = colors,
-                start = Offset(offset, offset),
-                end = Offset(offset - 400f, offset - 400f),
-                tileMode = TileMode.Repeated
-            )
-            Spacer(
-                modifier = Modifier
-                    .fillMaxHeight(0.8f)
-                    .fillMaxWidth()
-                    .blur(15.dp)
-                    .paint(
-                        painterResource(id = R.drawable.hexagon),
-                        contentScale = ContentScale.FillBounds
-                    )
+
+//            Spacer(
+//                modifier = Modifier
+//                    .fillMaxHeight(0.8f)
+//                    .fillMaxWidth()
+//                    .blur(0.dp)
+////                    .paint(
+////                        painterResource(id = R.drawable.hexagon),
+////                        contentScale = ContentScale.FillBounds
+////                    )
 //                    .drawWithCache {
 //                        onDrawBehind { drawRect(brush) }
 //                    }
-            )
+//            )
             Column(
                 modifier = Modifier
                     .fillMaxSize(),
@@ -190,7 +222,9 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
                         model = if (gifState.toString() == GifState.Walking.toString()) walking_request else request,
                         contentDescription = null ,
                         imageLoader = gifloader,
-                        contentScale = ContentScale.Crop,
+                        contentScale = ContentScale.FillBounds
+
+                        ,
                         modifier = Modifier
                             .fillMaxSize()
                             .clip(CircleShape)
@@ -199,15 +233,16 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
             }
         }
         
-        Spacer(modifier = Modifier.height(190.dp))
+        Spacer(modifier = Modifier.height(90.dp))
 
         Column(
             modifier = Modifier
                 .height(150.dp)
                 .fillMaxWidth(0.85f)
                 .clip(shape = RoundedCornerShape(15.dp))
+                .background(color = Color.Transparent)
                 .shadow(elevation = 4.dp)
-                .background(color = MaterialTheme.colorScheme.primaryContainer),
+                ,
 
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
@@ -249,6 +284,10 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                 fontSize = MaterialTheme.typography.titleMedium.fontSize
             )
+        }
+
+        Button(onClick = { requestPermission.launch(declined_permissions) }) {
+            Text(text = "Request permission")
         }
 
     }
