@@ -10,7 +10,7 @@ object StepViewModelLinker{
     private val _stepPercentage = MutableStateFlow(0f)
     val stepPercentage : MutableStateFlow<Float> get() = _stepPercentage
 
-    private val _stepGoal = MutableStateFlow(5000L)
+    private val _stepGoal = MutableStateFlow(700L)
     val stepGoal : MutableStateFlow<Long> get() = _stepGoal
 
     private val _gifState = MutableStateFlow(GifState.Standing)

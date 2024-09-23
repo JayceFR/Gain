@@ -12,6 +12,8 @@ class StepViewModel() : ViewModel() {
 
     val stepPercentage : StateFlow<Float> get() = StepViewModelLinker.stepPercentage
 
+    val stepGoal : StateFlow<Long> get() = StepViewModelLinker.stepGoal
+
     private val _lastupdate = MutableStateFlow("");
     val lastupdate : StateFlow<String> get() = _lastupdate
 

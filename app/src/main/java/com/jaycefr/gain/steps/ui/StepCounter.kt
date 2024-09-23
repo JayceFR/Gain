@@ -22,6 +22,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
@@ -41,13 +44,17 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.room.Room
 import coil.ImageLoader
+import coil.compose.AsyncImage
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
@@ -71,6 +78,10 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
     val stepCount by stepViewModel.stepCount.collectAsState()
     val lastUpdate by stepViewModel.lastupdate.collectAsState()
     val stepPercentage by stepViewModel.stepPercentage.collectAsState()
+    val stepGoal by stepViewModel.stepGoal.collectAsState()
+
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
 
     val gifState by stepViewModel.gifState.collectAsState()
 
@@ -205,18 +216,37 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
 
         Column(
             modifier = Modifier
+                .fillMaxWidth(0.9f)
+        ) {
+            AsyncImage(
+                model = if (gifState.toString() == GifState.Walking.toString()) walking_request else request,
+                contentDescription = null ,
+                imageLoader = gifloader,
+                contentScale = ContentScale.FillBounds,
+                modifier = Modifier
+                    .width(52.dp)
+                    .height(52.dp)
+                    .offset(screenWidth * 0.9f * stepPercentage - 26.dp, 0.dp)
+                    .clip(CircleShape),
+            )
+        }
+
+        Column(
+            modifier = Modifier
                 .height(40.dp)
                 .fillMaxWidth(0.9f)
 //                .background(Color.Gray)
         ) {
+
             LinearProgressIndicator(
                 progress = {
-                    0.8f
+                    stepPercentage
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(15.dp)
                     .clip(RoundedCornerShape(15.dp)),
+                strokeCap = StrokeCap.Round,
                 color = Color.Green,
                 trackColor = Color.Magenta
             )
@@ -232,12 +262,13 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
-                    text = "5000",
+                    text = "$stepGoal",
                     color = MaterialTheme.colorScheme.onBackground
 
                 )
             }
         }
+
 
 
         Spacer(modifier = Modifier.height(20.dp))
