@@ -100,9 +100,9 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
 
     if (!isSystemInDarkTheme()){
         colors = mutableListOf(
-            Color(185, 212, 220, 100),
-            Color(200, 227, 233, 100),
-            Color(215, 240, 252, 100))
+            Color(150, 200, 215, 100),
+            Color(175, 215, 225, 100),
+            Color(190, 235, 250, 100))
     }
     else{
         colors = mutableListOf(Color(27, 54, 66, 100), Color(42, 69, 75, 100), Color(41, 72, 97, 100))
@@ -250,13 +250,13 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
 
             Text(
                 text = "$stepCount",
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = MaterialTheme.typography.displayLarge.fontSize
             )
 
             Text(
                 text = "Steps Taken",
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                color = MaterialTheme.colorScheme.onSecondary,
                 fontSize = MaterialTheme.typography.titleMedium.fontSize
             )
         }
@@ -275,13 +275,13 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
             ){
             Text(
                 text = "${(stepCount * 0.762).toInt()}m",
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = MaterialTheme.typography.displayLarge.fontSize
             )
 
             Text(
                 text = "Distance Covered",
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                color = MaterialTheme.colorScheme.onSecondary,
                 fontSize = MaterialTheme.typography.titleMedium.fontSize
             )
         }
