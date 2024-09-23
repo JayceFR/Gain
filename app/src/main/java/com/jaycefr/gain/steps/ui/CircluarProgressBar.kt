@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -31,7 +32,7 @@ fun CircularProgressBar(
     number : Long,
     percentage : Float,
     fontSize: TextUnit = 28.sp,
-    radius: Dp = 50.dp,
+    radius: Dp = 60.dp,
     color: Color = Color.Green,
     colorHue: Color = Color.Magenta,
     strokeWidth : Dp = 8.dp,
@@ -86,7 +87,7 @@ fun CircularProgressBar(
         }
         
         Text(
-            text = "$number",
+            text = "$number\n \uD83D\uDC5F",
             color = MaterialTheme.colorScheme.onBackground,
             fontSize = fontSize,
             fontWeight = FontWeight.Bold

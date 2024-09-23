@@ -2,6 +2,7 @@ package com.jaycefr.gain.steps.ui
 
 import android.content.Context
 import android.os.Build
+import android.view.RoundedCorner
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -15,12 +16,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -195,32 +199,47 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
         
         Spacer(modifier = Modifier.height(90.dp))
 
+        CircularProgressBar(percentage = stepPercentage, number = stepCount)
+        
+        Spacer(modifier = Modifier.height(20.dp))
+
         Column(
             modifier = Modifier
-                .height(150.dp)
-                .fillMaxWidth(0.85f)
-                .clip(shape = RoundedCornerShape(15.dp))
-                .shadow(elevation = 4.dp)
-                .background(color = MaterialTheme.colorScheme.primaryContainer),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+                .height(40.dp)
+                .fillMaxWidth(0.9f)
+//                .background(Color.Gray)
         ) {
-            CircularProgressBar(percentage = stepPercentage, number = stepCount)
-            
-//            Text(text = "$stepPercentage")
+            LinearProgressIndicator(
+                progress = {
+                    0.8f
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(15.dp)
+                    .clip(RoundedCornerShape(15.dp)),
+                color = Color.Green,
+                trackColor = Color.Magenta
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "0",
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Text(
+                    text = "5000",
+                    color = MaterialTheme.colorScheme.onBackground
 
-//            Text(
-//                text = "$stepCount",
-//                color = MaterialTheme.colorScheme.onBackground,
-//                fontSize = MaterialTheme.typography.displayLarge.fontSize
-//            )
-//
-//            Text(
-//                text = "Steps Taken",
-//                color = MaterialTheme.colorScheme.onSecondary,
-//                fontSize = MaterialTheme.typography.titleMedium.fontSize
-//            )
+                )
+            }
         }
+
+
         Spacer(modifier = Modifier.height(20.dp))
         Column(
             modifier = Modifier
