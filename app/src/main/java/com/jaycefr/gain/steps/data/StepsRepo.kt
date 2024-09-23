@@ -1,11 +1,6 @@
-package com.jaycefr.gain.steps
+package com.jaycefr.gain.steps.data
 
-import android.content.Context
-import android.os.Build
 import android.util.Log
-import android.widget.Toast
-import androidx.annotation.RequiresApi
-import androidx.compose.runtime.MutableState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +9,6 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import kotlin.coroutines.coroutineContext
 
 class StepsRepo (
     private val stepsDao: StepsDao
@@ -75,18 +69,3 @@ class StepsRepo (
 
 }
 
-object StepViewModelLinker{
-    private val _stepCount = MutableStateFlow(0L)
-    val stepCount : MutableStateFlow<Long> get() = _stepCount
-
-    private val _gifState = MutableStateFlow(GifState.Standing)
-    val gifState : StateFlow<GifState> get() = _gifState
-
-    fun updateStepCount(count : Long){
-        _stepCount.value = count
-    }
-
-    fun updateGifState(state: GifState){
-        _gifState.value = state
-    }
-}

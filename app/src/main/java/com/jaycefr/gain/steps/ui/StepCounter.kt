@@ -1,21 +1,10 @@
-package com.jaycefr.gain.steps
+package com.jaycefr.gain.steps.ui
 
-import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
-import android.media.Image
 import android.os.Build
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -25,28 +14,16 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -55,32 +32,28 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.draw.paint
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TileMode
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.room.Room
 import coil.ImageLoader
-import coil.compose.AsyncImage
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
 import com.jaycefr.gain.PermissionManagerViewModel
 import com.jaycefr.gain.R
+import com.jaycefr.gain.steps.data.GifState
+import com.jaycefr.gain.steps.data.StepAppDatabase
+import com.jaycefr.gain.steps.data.StepViewModel
+import com.jaycefr.gain.steps.data.StepViewModelLinker
+import com.jaycefr.gain.steps.data.StepsRepo
 import java.time.Instant
 
 @RequiresApi(Build.VERSION_CODES.Q)
@@ -93,6 +66,7 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
 
     val stepCount by stepViewModel.stepCount.collectAsState()
     val lastUpdate by stepViewModel.lastupdate.collectAsState()
+    val stepPercentage by stepViewModel.stepPercentage.collectAsState()
 
     val gifState by stepViewModel.gifState.collectAsState()
 
@@ -183,55 +157,41 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
 
     Column (
         modifier = Modifier
-            .fillMaxSize()
-            .background(brush),
+            .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Box(
-            modifier = Modifier
-                .height(300.dp)
-
-        ){
-
-//            Spacer(
+//        Box(
+//            modifier = Modifier
+//                .height(300.dp)
+//
+//        ){
+//
+//            Column(
 //                modifier = Modifier
-//                    .fillMaxHeight(0.8f)
-//                    .fillMaxWidth()
-//                    .blur(0.dp)
-////                    .paint(
-////                        painterResource(id = R.drawable.hexagon),
-////                        contentScale = ContentScale.FillBounds
-////                    )
-//                    .drawWithCache {
-//                        onDrawBehind { drawRect(brush) }
-//                    }
-//            )
-            Column(
-                modifier = Modifier
-                    .fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ){
-                Box(
-                    modifier = Modifier
-                        .offset(y = 180.dp)
-                        .clip(CircleShape)
-                        .size(100.dp)
-                ){
-                    AsyncImage(
-                        model = if (gifState.toString() == GifState.Walking.toString()) walking_request else request,
-                        contentDescription = null ,
-                        imageLoader = gifloader,
-                        contentScale = ContentScale.FillBounds
-
-                        ,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(CircleShape)
-                    )
-                }
-            }
-        }
+//                    .fillMaxSize(),
+//                horizontalAlignment = Alignment.CenterHorizontally
+//            ){
+//                Box(
+//                    modifier = Modifier
+//                        .offset(y = 180.dp)
+//                        .clip(CircleShape)
+//                        .size(100.dp)
+//                ){
+//                    AsyncImage(
+//                        model = if (gifState.toString() == GifState.Walking.toString()) walking_request else request,
+//                        contentDescription = null ,
+//                        imageLoader = gifloader,
+//                        contentScale = ContentScale.FillBounds
+//
+//                        ,
+//                        modifier = Modifier
+//                            .fillMaxSize()
+//                            .clip(CircleShape)
+//                    )
+//                }
+//            }
+//        }
         
         Spacer(modifier = Modifier.height(90.dp))
 
@@ -240,25 +200,26 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
                 .height(150.dp)
                 .fillMaxWidth(0.85f)
                 .clip(shape = RoundedCornerShape(15.dp))
-                .background(color = Color.Transparent)
                 .shadow(elevation = 4.dp)
-                ,
-
+                .background(color = MaterialTheme.colorScheme.primaryContainer),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
+            CircularProgressBar(percentage = stepPercentage, number = stepCount)
+            
+//            Text(text = "$stepPercentage")
 
-            Text(
-                text = "$stepCount",
-                color = MaterialTheme.colorScheme.onBackground,
-                fontSize = MaterialTheme.typography.displayLarge.fontSize
-            )
-
-            Text(
-                text = "Steps Taken",
-                color = MaterialTheme.colorScheme.onSecondary,
-                fontSize = MaterialTheme.typography.titleMedium.fontSize
-            )
+//            Text(
+//                text = "$stepCount",
+//                color = MaterialTheme.colorScheme.onBackground,
+//                fontSize = MaterialTheme.typography.displayLarge.fontSize
+//            )
+//
+//            Text(
+//                text = "Steps Taken",
+//                color = MaterialTheme.colorScheme.onSecondary,
+//                fontSize = MaterialTheme.typography.titleMedium.fontSize
+//            )
         }
         Spacer(modifier = Modifier.height(20.dp))
         Column(
@@ -285,6 +246,7 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
                 fontSize = MaterialTheme.typography.titleMedium.fontSize
             )
         }
+
 
         Button(onClick = { requestPermission.launch(declined_permissions) }) {
             Text(text = "Request permission")

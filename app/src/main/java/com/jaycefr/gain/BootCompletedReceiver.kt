@@ -3,17 +3,6 @@ package com.jaycefr.gain
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import androidx.glance.appwidget.updateAll
-import com.jaycefr.gain.steps.Actions
-import com.jaycefr.gain.steps.StepForegroundService
-import com.jaycefr.gain.steps.StepWidget
-import com.jaycefr.gain.steps.StepWidgetReceiver
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.suspendCoroutine
 
 class BootCompletedReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {

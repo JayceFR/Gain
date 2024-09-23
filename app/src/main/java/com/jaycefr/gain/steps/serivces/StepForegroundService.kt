@@ -1,10 +1,9 @@
-package com.jaycefr.gain.steps
+package com.jaycefr.gain.steps.serivces
 
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.IBinder
 import android.app.Service
-import android.content.ComponentName
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -14,6 +13,10 @@ import androidx.core.app.NotificationCompat
 import androidx.glance.appwidget.updateAll
 import androidx.room.Room
 import com.jaycefr.gain.R
+import com.jaycefr.gain.steps.data.GifState
+import com.jaycefr.gain.steps.data.StepAppDatabase
+import com.jaycefr.gain.steps.data.StepViewModelLinker
+import com.jaycefr.gain.steps.data.StepsRepo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
