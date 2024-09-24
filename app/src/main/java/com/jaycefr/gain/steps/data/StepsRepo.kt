@@ -47,15 +47,14 @@ class StepsRepo (
     }
 
     suspend fun loadWeeklyHistory() : MutableList<Int>{
-        var day : Int = LocalDate.now().dayOfWeek.value
+        val day : Int = LocalDate.now().dayOfWeek.value
         val returnList = mutableListOf<Int>(0,0,0,0,0,0,0)
-        while(day != 0){
-            val curr_date = LocalDate.now().minusDays(day.toLong())
+        for (x in 1..day){
+            val curr_date = LocalDate.now().minusDays(day.toLong()).plusDays(x.toLong())
             val today_steps : Long = loadTodaySteps(curr_date)
             if (today_steps >= StepViewModelLinker.stepGoal.value){
-                returnList[day-1] = 1
+                returnList[x-1] = 1
             }
-            day-- ;
         }
         return returnList;
     }

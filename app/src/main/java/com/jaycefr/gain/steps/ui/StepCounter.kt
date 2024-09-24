@@ -357,6 +357,8 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
             }
             
         }
+        
+        Spacer(modifier = Modifier.height(40.dp))
 
         Button(onClick = { requestPermission.launch(declined_permissions) }) {
             Text(text = "Request permission")

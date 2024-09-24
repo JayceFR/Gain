@@ -85,13 +85,22 @@ fun CircularProgressBar(
                 style = Stroke(strokeWidth.toPx(), cap= StrokeCap.Round)
             )
         }
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.Center),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "$number",
+                color = MaterialTheme.colorScheme.onBackground,
+                fontSize = fontSize,
+                fontWeight = FontWeight.Bold,
+            )
+            Text(text = "\uD83D\uDC5F")
+        }
         
-        Text(
-            text = "$number\n \uD83D\uDC5F",
-            color = MaterialTheme.colorScheme.onBackground,
-            fontSize = fontSize,
-            fontWeight = FontWeight.Bold
-        )
+
         
     }
 

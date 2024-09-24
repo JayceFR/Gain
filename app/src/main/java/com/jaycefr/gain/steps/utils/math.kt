@@ -9,5 +9,7 @@ fun getDecimalPlace(number : Float, decimal_places : Int = 2) : String{
 
 fun main(){
     val day : Int = LocalDate.now().dayOfWeek.value
-    println( LocalDate.now().minusDays(day.toLong()).dayOfWeek.value)
+    for( x in 1..day){
+        println(LocalDate.now().minusDays(day.toLong()).plusDays(x.toLong()).toString())
+    }
 }
