@@ -2,16 +2,9 @@ package com.jaycefr.gain.steps.ui
 
 import android.content.Context
 import android.os.Build
-import android.view.RoundedCorner
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -24,7 +17,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,25 +29,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -68,11 +53,11 @@ import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
 import com.jaycefr.gain.PermissionManagerViewModel
 import com.jaycefr.gain.R
-import com.jaycefr.gain.steps.data.GifState
-import com.jaycefr.gain.steps.data.StepAppDatabase
-import com.jaycefr.gain.steps.data.StepViewModel
-import com.jaycefr.gain.steps.data.StepViewModelLinker
-import com.jaycefr.gain.steps.data.StepsRepo
+import com.jaycefr.gain.steps.link.GifState
+import com.jaycefr.gain.steps.models.StepAppDatabase
+import com.jaycefr.gain.steps.link.StepViewModel
+import com.jaycefr.gain.steps.link.StepViewModelLinker
+import com.jaycefr.gain.steps.link.StepsRepo
 import com.jaycefr.gain.steps.utils.NormalText
 import com.jaycefr.gain.steps.utils.getDecimalPlace
 import java.time.Instant
@@ -92,6 +77,7 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
     val lastUpdate by stepViewModel.lastupdate.collectAsState()
     val stepPercentage by stepViewModel.stepPercentage.collectAsState()
     val stepGoal by stepViewModel.stepGoal.collectAsState()
+    val stepWeekStreak by stepViewModel.stepWeekStreak.collectAsState()
 
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
@@ -131,8 +117,11 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
         } else{
             StepViewModelLinker.updateGifState(GifState.Walking)
         }
-        
-        stepViewModel.updateStepWeekList(stepsRepo?.loadWeeklyHistory()!!)
+
+        val (weekHistory, streak) = stepsRepo?.loadWeeklyHistory()!!
+
+        stepViewModel.updateStepWeekList(weekHistory)
+        stepViewModel.updateStepWeekStreak(streak)
 
     }
 
@@ -235,8 +224,6 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
             }
         }
 
-
-
         Spacer(modifier = Modifier.height(20.dp))
         Column(
             modifier = Modifier
@@ -293,7 +280,7 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
 
         Column(
             modifier = Modifier
-                .height(150.dp)
+                .height(250.dp)
                 .fillMaxWidth(0.9f)
                 .clip(shape = RoundedCornerShape(25.dp))
                 .shadow(elevation = 4.dp)
@@ -355,6 +342,19 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
                 }
 
             }
+            
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            Text(
+                text = "$stepWeekStreak day Streak!",
+                textAlign = TextAlign.Start,
+                fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier
+                    .offset(x = (15).dp)
+            )
+
+
             
         }
         

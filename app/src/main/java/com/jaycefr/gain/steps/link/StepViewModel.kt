@@ -1,7 +1,6 @@
-package com.jaycefr.gain.steps.data
+package com.jaycefr.gain.steps.link
 
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -17,6 +16,9 @@ class StepViewModel() : ViewModel() {
     private val _stepWeekList = MutableStateFlow(mutableListOf<Int>())
     val stepWeekList : StateFlow<MutableList<Int>> get() = _stepWeekList
 
+    private val _stepWeekStreak = MutableStateFlow(0)
+    val stepWeekStreak : StateFlow<Int> get() = _stepWeekStreak
+
     private val _lastupdate = MutableStateFlow("");
     val lastupdate : StateFlow<String> get() = _lastupdate
 
@@ -28,6 +30,10 @@ class StepViewModel() : ViewModel() {
 
     fun updateStepWeekList(list: MutableList<Int>){
         _stepWeekList.value = list
+    }
+
+    fun updateStepWeekStreak(streak: Int){
+        _stepWeekStreak.value = streak
     }
 
 }

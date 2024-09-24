@@ -20,7 +20,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.jaycefr.gain.steps.serivces.Actions
 import com.jaycefr.gain.steps.ui.StepCounterScreen
 import com.jaycefr.gain.steps.serivces.StepForegroundService
-import com.jaycefr.gain.steps.data.StepViewModel
+import com.jaycefr.gain.steps.link.StepViewModel
 import com.jaycefr.gain.ui.theme.GainTheme
 
 

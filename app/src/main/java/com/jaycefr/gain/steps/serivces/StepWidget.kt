@@ -14,7 +14,7 @@ import androidx.glance.appwidget.provideContent
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.fillMaxSize
 import com.jaycefr.gain.MainActivity
-import com.jaycefr.gain.steps.data.StepViewModelLinker
+import com.jaycefr.gain.steps.link.StepViewModelLinker
 import kotlinx.coroutines.runBlocking
 
 object StepWidget : GlanceAppWidget() {

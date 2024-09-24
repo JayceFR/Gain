@@ -1,9 +1,10 @@
-package com.jaycefr.gain.steps.data
+package com.jaycefr.gain.steps.link
 
 import android.util.Log
+import com.jaycefr.gain.steps.models.StepCount
+import com.jaycefr.gain.steps.models.StepsDao
+import com.jaycefr.gain.steps.models.WeekStep
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.LocalDate
@@ -46,17 +47,21 @@ class StepsRepo (
         }
     }
 
-    suspend fun loadWeeklyHistory() : MutableList<Int>{
+    suspend fun loadWeeklyHistory() : WeekStep = withContext(Dispatchers.IO){
         val day : Int = LocalDate.now().dayOfWeek.value
         val returnList = mutableListOf<Int>(0,0,0,0,0,0,0)
+        var streak : Int = 0
         for (x in 1..day){
             val curr_date = LocalDate.now().minusDays(day.toLong()).plusDays(x.toLong())
             val today_steps : Long = loadTodaySteps(curr_date)
             if (today_steps >= StepViewModelLinker.stepGoal.value){
                 returnList[x-1] = 1
+                streak ++;
+            }else{
+                streak = 0;
             }
         }
-        return returnList;
+        WeekStep(returnList, streak);
     }
 
     suspend fun getLastStepUpdate() : String = withContext(Dispatchers.IO) {

@@ -1,4 +1,4 @@
-package com.jaycefr.gain.steps.data
+package com.jaycefr.gain.steps.link
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -13,10 +13,10 @@ import androidx.core.app.NotificationCompat
 import androidx.glance.appwidget.updateAll
 import androidx.room.Room
 import com.jaycefr.gain.R
-import com.jaycefr.gain.steps.data.GifState
-import com.jaycefr.gain.steps.data.StepAppDatabase
-import com.jaycefr.gain.steps.data.StepViewModelLinker
-import com.jaycefr.gain.steps.data.StepsRepo
+import com.jaycefr.gain.steps.link.GifState
+import com.jaycefr.gain.steps.models.StepAppDatabase
+import com.jaycefr.gain.steps.link.StepViewModelLinker
+import com.jaycefr.gain.steps.link.StepsRepo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
