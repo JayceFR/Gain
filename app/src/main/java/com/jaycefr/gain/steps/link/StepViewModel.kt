@@ -73,9 +73,9 @@ class StepViewModel() : ViewModel() {
 
     fun initLineChart(){
         val xAxisData = AxisData.Builder()
-            .axisStepSize(100.dp)
+            .axisStepSize(20.dp)
             .backgroundColor(Color.Blue)
-            .steps(_graphPointData.value.size - 1)
+            .steps(6)
             .labelData { i -> i.toString() }
             .labelAndAxisLinePadding(15.dp)
             .build()
