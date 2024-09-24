@@ -1,6 +1,7 @@
 package com.jaycefr.gain.steps.link
 
 import android.util.Log
+import com.jaycefr.gain.steps.models.GraphData
 import com.jaycefr.gain.steps.models.StepCount
 import com.jaycefr.gain.steps.models.StepsDao
 import com.jaycefr.gain.steps.models.WeekStep
@@ -10,6 +11,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.ZoneId
 
 class StepsRepo (
     private val stepsDao: StepsDao
@@ -45,6 +47,25 @@ class StepsRepo (
                 todaySteps
             }
         }
+    }
+
+    suspend fun generateGraphPoints(date: LocalDate = LocalDate.now()) : GraphData = withContext(Dispatchers.IO){
+        val xAxisData = mutableListOf<Int>()
+        val yAxisData = mutableListOf<Long>()
+        val todayAtMidnight = (LocalDateTime.of(date, LocalTime.MIDNIGHT).toString())
+        val todayDataPoints = stepsDao.loadAllStepsFromToday(todayAtMidnight)
+
+        var previousValue : Long = 0;
+        
+        for (x in todayDataPoints.indices){
+            if (todayDataPoints[x].steps > previousValue){
+                yAxisData.add(todayDataPoints[x].steps)
+                xAxisData.add(Instant.parse(todayDataPoints[x].createdAt).atZone(ZoneId.systemDefault()).hour)
+                previousValue = todayDataPoints[x].steps
+            }
+        }
+
+        GraphData(xAxisData, yAxisData)
     }
 
     suspend fun loadWeeklyHistory() : WeekStep = withContext(Dispatchers.IO){

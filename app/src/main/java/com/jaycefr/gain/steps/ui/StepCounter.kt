@@ -349,7 +349,7 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
                         day(
                             text = LocalDate.now().minusDays(LocalDate.now().dayOfWeek.value.toLong()).plusDays(
                             (x+1).toLong()).toString().split("-")[2],
-                            color = if (stepWeekList.value[x] == 1) Color.Magenta else Color.Red
+                            color = if (stepWeekList.value[x] == 1) Color.Green.copy(alpha = 0.6f) else Color.Red.copy(alpha = 0.6f)
                         )
                     }
                 }
