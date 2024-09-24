@@ -2,10 +2,12 @@ package com.jaycefr.gain.steps.ui
 
 import android.content.Context
 import android.os.Build
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -79,6 +81,8 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
     val stepPercentage by stepViewModel.stepPercentage.collectAsState()
     val stepGoal by stepViewModel.stepGoal.collectAsState()
     val stepWeekStreak by stepViewModel.stepWeekStreak.collectAsState()
+
+    val currentlySelectedDate by stepViewModel.currentlySelectedDay.collectAsState()
 
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
@@ -327,12 +331,20 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                for(x in 0..<stepWeekList.value.size-1){
+                for(x in 0..<stepWeekList.value.size){
                     Column(
                         verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .clickable {
+                                stepViewModel.updateCurrentlySelectedDay(x)
+                                Toast.makeText(context, "Clicked $x", Toast.LENGTH_SHORT).show()
+                            }
                     ) {
-                        NormalText(text = days[x])
+                        NormalText(
+                            text = days[x],
+                            color = if (currentlySelectedDate == x) Color.Magenta else MaterialTheme.colorScheme.onBackground
+                        )
                         Spacer(modifier = Modifier.height(12.dp))
                         day(
                             text = LocalDate.now().minusDays(LocalDate.now().dayOfWeek.value.toLong()).plusDays(
@@ -354,9 +366,6 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
                 modifier = Modifier
                     .offset(x = (15).dp)
             )
-
-
-            
         }
         
         Spacer(modifier = Modifier.height(40.dp))
