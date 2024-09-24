@@ -62,6 +62,7 @@ import com.jaycefr.gain.steps.utils.NormalText
 import com.jaycefr.gain.steps.utils.getDecimalPlace
 import java.time.Instant
 import java.time.LocalDate
+import kotlin.math.min
 
 @RequiresApi(Build.VERSION_CODES.Q)
 @Composable
@@ -182,7 +183,7 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
                 modifier = Modifier
                     .width(52.dp)
                     .height(52.dp)
-                    .offset(screenWidth * 0.9f * stepPercentage - 26.dp, 0.dp)
+                    .offset(screenWidth * 0.9f * min(stepPercentage, 1f) - 26.dp, 0.dp)
                     .clip(CircleShape),
             )
         }
