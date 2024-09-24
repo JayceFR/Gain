@@ -14,6 +14,9 @@ class StepViewModel() : ViewModel() {
 
     val stepGoal : StateFlow<Long> get() = StepViewModelLinker.stepGoal
 
+    private val _stepWeekList = MutableStateFlow(mutableListOf<Int>())
+    val stepWeekList : StateFlow<MutableList<Int>> get() = _stepWeekList
+
     private val _lastupdate = MutableStateFlow("");
     val lastupdate : StateFlow<String> get() = _lastupdate
 
@@ -21,6 +24,10 @@ class StepViewModel() : ViewModel() {
 
     fun updateLastUpdate(update: String){
         _lastupdate.value = update
+    }
+
+    fun updateStepWeekList(list: MutableList<Int>){
+        _stepWeekList.value = list
     }
 
 }

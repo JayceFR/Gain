@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,9 +37,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -73,6 +76,7 @@ import com.jaycefr.gain.steps.data.StepsRepo
 import com.jaycefr.gain.steps.utils.NormalText
 import com.jaycefr.gain.steps.utils.getDecimalPlace
 import java.time.Instant
+import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.Q)
 @Composable
@@ -81,6 +85,8 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
 
     var db by remember { mutableStateOf<StepAppDatabase?>(null) }
     var stepsRepo by remember { mutableStateOf<StepsRepo?>(null) }
+    
+    var stepWeekList = stepViewModel.stepWeekList.collectAsState()
 
     val stepCount by stepViewModel.stepCount.collectAsState()
     val lastUpdate by stepViewModel.lastupdate.collectAsState()
@@ -91,6 +97,8 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
     val screenWidth = configuration.screenWidthDp.dp
 
     val gifState by stepViewModel.gifState.collectAsState()
+
+    val days = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
     var colors = mutableListOf<Color>()
 
@@ -123,7 +131,8 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
         } else{
             StepViewModelLinker.updateGifState(GifState.Walking)
         }
-
+        
+        stepViewModel.updateStepWeekList(stepsRepo?.loadWeeklyHistory()!!)
 
     }
 
@@ -169,7 +178,7 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
         Spacer(modifier = Modifier.height(90.dp))
 
         CircularProgressBar(percentage = stepPercentage, number = stepCount)
-        
+
         Spacer(modifier = Modifier.height(20.dp))
 
         Column(
@@ -178,7 +187,7 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
         ) {
             AsyncImage(
                 model = if (gifState.toString() == GifState.Walking.toString()) walking_request else request,
-                contentDescription = null ,
+                contentDescription = null,
                 imageLoader = gifloader,
                 contentScale = ContentScale.FillBounds,
                 modifier = Modifier
@@ -240,7 +249,7 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
 
-            ){
+            ) {
             Text(
                 text = "${(stepCount * 0.762).toInt()}m",
                 color = MaterialTheme.colorScheme.onBackground,
@@ -266,7 +275,7 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
 
-            ){
+            ) {
             Text(
                 text = "${getDecimalPlace(stepCount * 0.033f)}kcal",
                 color = MaterialTheme.colorScheme.onBackground,
@@ -293,11 +302,11 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Top,
 
-            ){
-            
+            ) {
+
             Spacer(modifier = Modifier.height(12.dp))
 
-            Row (
+            Row(
                 modifier = Modifier
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -306,7 +315,7 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
                 Text(
                     text = "This Week",
                     fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                    color = MaterialTheme.colorScheme.onSecondary,
+                    color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.End,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
@@ -322,22 +331,31 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
                         .offset(x = (-15).dp)
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(12.dp))
 
-            Row (
+            Row(
                 modifier = Modifier
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                NormalText(text = "Mon")
-                NormalText(text = "Tue")
-                NormalText(text = "Wed")
-                NormalText(text = "Thu")
-                NormalText(text = "Fri")
-                NormalText(text = "Sat")
-                NormalText(text = "Sun")
+                for(x in 0..<stepWeekList.value.size-1){
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        NormalText(text = days[x])
+                        Spacer(modifier = Modifier.height(12.dp))
+                        day(
+                            text = LocalDate.now().minusDays(LocalDate.now().dayOfWeek.value.toLong()).plusDays(
+                            (x+1).toLong()).toString().split("-")[2],
+                            color = if (stepWeekList.value[x] == 1) Color.Magenta else Color.Red
+                        )
+                    }
+                }
+
             }
+            
         }
 
         Button(onClick = { requestPermission.launch(declined_permissions) }) {

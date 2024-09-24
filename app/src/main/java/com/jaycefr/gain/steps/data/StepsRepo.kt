@@ -22,8 +22,8 @@ class StepsRepo (
         stepsDao.insertAll(stepCount)
     }
 
-    suspend fun loadTodaySteps() : Long = withContext(Dispatchers.IO) {
-        val todayAtMidnight = (LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).toString())
+    suspend fun loadTodaySteps(date: LocalDate = LocalDate.now() ) : Long = withContext(Dispatchers.IO) {
+        val todayAtMidnight = (LocalDateTime.of(date, LocalTime.MIDNIGHT).toString())
         val todayDataPoints = stepsDao.loadAllStepsFromToday(todayAtMidnight)
         when{
             todayDataPoints.isEmpty() -> {
@@ -44,6 +44,20 @@ class StepsRepo (
                 todaySteps
             }
         }
+    }
+
+    suspend fun loadWeeklyHistory() : MutableList<Int>{
+        var day : Int = LocalDate.now().dayOfWeek.value
+        val returnList = mutableListOf<Int>(0,0,0,0,0,0,0)
+        while(day != 0){
+            val curr_date = LocalDate.now().minusDays(day.toLong())
+            val today_steps : Long = loadTodaySteps(curr_date)
+            if (today_steps >= StepViewModelLinker.stepGoal.value){
+                returnList[day-1] = 1
+            }
+            day-- ;
+        }
+        return returnList;
     }
 
     suspend fun getLastStepUpdate() : String = withContext(Dispatchers.IO) {

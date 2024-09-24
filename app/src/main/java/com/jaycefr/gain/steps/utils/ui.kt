@@ -9,6 +9,6 @@ fun NormalText(text : String){
     Text(
         text = text,
         fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-        color = MaterialTheme.colorScheme.onBackground
+        color = MaterialTheme.colorScheme.onSecondary
     )
 }
