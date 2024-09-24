@@ -1,6 +1,19 @@
 package com.jaycefr.gain.steps.link
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
+import co.yml.charts.axis.AxisData
+import co.yml.charts.common.model.Point
+import co.yml.charts.ui.linechart.model.GridLines
+import co.yml.charts.ui.linechart.model.IntersectionPoint
+import co.yml.charts.ui.linechart.model.Line
+import co.yml.charts.ui.linechart.model.LineChartData
+import co.yml.charts.ui.linechart.model.LinePlotData
+import co.yml.charts.ui.linechart.model.LineStyle
+import co.yml.charts.ui.linechart.model.SelectionHighlightPoint
+import co.yml.charts.ui.linechart.model.SelectionHighlightPopUp
+import co.yml.charts.ui.linechart.model.ShadowUnderLine
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.time.LocalDate
@@ -26,6 +39,12 @@ class StepViewModel() : ViewModel() {
     private val _lastupdate = MutableStateFlow("");
     val lastupdate : StateFlow<String> get() = _lastupdate
 
+    private val _graphPointData = MutableStateFlow(mutableListOf<Point>())
+    val graphPointData : StateFlow<MutableList<Point>> get() = _graphPointData
+
+    private val _lineChartData = MutableStateFlow<LineChartData?>(null)
+    val lineChartData : StateFlow<LineChartData?> get() = _lineChartData
+
     val gifState : StateFlow<GifState> get() = StepViewModelLinker.gifState
 
     init {
@@ -46,6 +65,50 @@ class StepViewModel() : ViewModel() {
 
     fun updateCurrentlySelectedDay(day: Int){
         _currentlySelectedDay.value = day
+    }
+
+    fun updateGraphPointData(data: MutableList<Point>){
+        _graphPointData.value = data
+    }
+
+    fun initLineChart(){
+        val xAxisData = AxisData.Builder()
+            .axisStepSize(100.dp)
+            .backgroundColor(Color.Blue)
+            .steps(_graphPointData.value.size - 1)
+            .labelData { i -> i.toString() }
+            .labelAndAxisLinePadding(15.dp)
+            .build()
+
+        val steps = 5
+
+        val yAxisData = AxisData.Builder()
+            .steps(steps)
+            .backgroundColor(Color.Red)
+            .labelAndAxisLinePadding(20.dp)
+            .labelData { i ->
+                val yScale = 100 / steps
+                (i * yScale).toString()
+            }.build()
+
+        _lineChartData.value = LineChartData(
+            linePlotData = LinePlotData(
+                lines = listOf(
+                    Line(
+                        dataPoints = _graphPointData.value,
+                        LineStyle(),
+                        IntersectionPoint(),
+                        SelectionHighlightPoint(),
+                        ShadowUnderLine(),
+                        SelectionHighlightPopUp()
+                    )
+                ),
+            ),
+            xAxisData = xAxisData,
+            yAxisData = yAxisData,
+            gridLines = GridLines(),
+            backgroundColor = Color.White
+        )
     }
 
 }

@@ -48,6 +48,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.room.Room
+import co.yml.charts.axis.AxisData
+import co.yml.charts.ui.linechart.LineChart
+import co.yml.charts.ui.linechart.model.GridLines
+import co.yml.charts.ui.linechart.model.IntersectionPoint
+import co.yml.charts.ui.linechart.model.Line
+import co.yml.charts.ui.linechart.model.LineChartData
+import co.yml.charts.ui.linechart.model.LinePlotData
+import co.yml.charts.ui.linechart.model.LineStyle
+import co.yml.charts.ui.linechart.model.SelectionHighlightPoint
+import co.yml.charts.ui.linechart.model.SelectionHighlightPopUp
+import co.yml.charts.ui.linechart.model.ShadowUnderLine
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.decode.GifDecoder
@@ -86,6 +97,9 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
 
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
+
+    val graphPointData by stepViewModel.graphPointData.collectAsState()
+    val lineCharData by stepViewModel.lineChartData.collectAsState()
 
     val gifState by stepViewModel.gifState.collectAsState()
 
@@ -127,7 +141,12 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
 
         stepViewModel.updateStepWeekList(weekHistory)
         stepViewModel.updateStepWeekStreak(streak)
+        stepViewModel.updateGraphPointData(stepsRepo?.generateGraphPoints(LocalDate.now().minusDays(1))!!)
+    }
 
+    if (graphPointData.size > 0){
+        stepViewModel.initLineChart()
+        println("I am here")
     }
 
     val gifloader = ImageLoader.Builder(LocalContext.current)
@@ -369,6 +388,14 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
         }
         
         Spacer(modifier = Modifier.height(40.dp))
+        lineCharData?.let {
+            LineChart(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp),
+                lineChartData = it
+            )
+        }
 
         Button(onClick = { requestPermission.launch(declined_permissions) }) {
             Text(text = "Request permission")
