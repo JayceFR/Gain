@@ -24,8 +24,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -50,6 +52,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.room.Room
@@ -65,6 +70,7 @@ import com.jaycefr.gain.steps.data.StepAppDatabase
 import com.jaycefr.gain.steps.data.StepViewModel
 import com.jaycefr.gain.steps.data.StepViewModelLinker
 import com.jaycefr.gain.steps.data.StepsRepo
+import com.jaycefr.gain.steps.utils.NormalText
 import com.jaycefr.gain.steps.utils.getDecimalPlace
 import java.time.Instant
 
@@ -155,8 +161,9 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
 
     Column (
         modifier = Modifier
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
         Spacer(modifier = Modifier.height(90.dp))
@@ -225,8 +232,8 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
         Column(
             modifier = Modifier
                 .height(150.dp)
-                .fillMaxWidth(0.85f)
-                .clip(shape = RoundedCornerShape(15.dp))
+                .fillMaxWidth(0.9f)
+                .clip(shape = RoundedCornerShape(25.dp))
                 .shadow(elevation = 4.dp)
                 .background(color = MaterialTheme.colorScheme.primaryContainer),
 
@@ -251,8 +258,8 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
         Column(
             modifier = Modifier
                 .height(150.dp)
-                .fillMaxWidth(0.85f)
-                .clip(shape = RoundedCornerShape(15.dp))
+                .fillMaxWidth(0.9f)
+                .clip(shape = RoundedCornerShape(25.dp))
                 .shadow(elevation = 4.dp)
                 .background(color = MaterialTheme.colorScheme.primaryContainer),
 
@@ -274,6 +281,64 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
         }
 
         Spacer(modifier = Modifier.height(20.dp))
+
+        Column(
+            modifier = Modifier
+                .height(150.dp)
+                .fillMaxWidth(0.9f)
+                .clip(shape = RoundedCornerShape(25.dp))
+                .shadow(elevation = 4.dp)
+                .background(color = MaterialTheme.colorScheme.primaryContainer),
+
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Top,
+
+            ){
+            
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row (
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+
+                Text(
+                    text = "This Week",
+                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                    color = MaterialTheme.colorScheme.onSecondary,
+                    textAlign = TextAlign.End,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .offset(x = (15).dp)
+                )
+
+                Text(
+                    text = "History",
+                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                    color = MaterialTheme.colorScheme.onSecondary,
+                    textAlign = TextAlign.End,
+                    modifier = Modifier
+                        .offset(x = (-15).dp)
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row (
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                NormalText(text = "Mon")
+                NormalText(text = "Tue")
+                NormalText(text = "Wed")
+                NormalText(text = "Thu")
+                NormalText(text = "Fri")
+                NormalText(text = "Sat")
+                NormalText(text = "Sun")
+            }
+        }
 
         Button(onClick = { requestPermission.launch(declined_permissions) }) {
             Text(text = "Request permission")
