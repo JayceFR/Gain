@@ -40,6 +40,9 @@ class StepViewModel() : ViewModel() {
     private val _currentlySelectedDay = MutableStateFlow(0)
     val currentlySelectedDay : StateFlow<Int> get() = _currentlySelectedDay
 
+    private val _selectedDaySteps = MutableStateFlow(0L)
+    val selectedDaySteps : StateFlow<Long> get() = _selectedDaySteps
+
     private val _lastupdate = MutableStateFlow("");
     val lastupdate : StateFlow<String> get() = _lastupdate
 
@@ -73,6 +76,10 @@ class StepViewModel() : ViewModel() {
 
     fun updateGraphPointData(data: MutableList<Point>){
         _graphPointData.value = data
+    }
+
+    fun updateSelectedDaySteps(steps: Long){
+        _selectedDaySteps.value = steps
     }
 
 
@@ -130,7 +137,7 @@ class StepViewModel() : ViewModel() {
             xAxisData = xAxisData,
             yAxisData = yAxisData,
             gridLines = null,
-            paddingTop = 10.dp,
+            paddingTop = 13.dp,
             paddingRight = 0.dp,
             containerPaddingEnd = 0.dp,
             bottomPadding = 0.dp,

@@ -75,6 +75,7 @@ import com.jaycefr.gain.steps.link.StepsRepo
 import com.jaycefr.gain.steps.utils.NormalText
 import com.jaycefr.gain.steps.utils.getDecimalPlace
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
@@ -97,6 +98,7 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
     val stepWeekStreak by stepViewModel.stepWeekStreak.collectAsState()
 
     val currentlySelectedDate by stepViewModel.currentlySelectedDay.collectAsState()
+    val selectedDaySteps by stepViewModel.selectedDaySteps.collectAsState()
 
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
@@ -136,6 +138,9 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
         stepViewModel.updateStepWeekList(weekHistory)
         stepViewModel.updateStepWeekStreak(streak)
         stepViewModel.updateGraphPointData(stepsRepo?.generateGraphPoints(LocalDate.now().minusDays(0))!!)
+
+        stepViewModel.updateSelectedDaySteps(stepCount)
+
     }
 
     if (graphPointData.size > 0 && lineCharData == null){
@@ -303,7 +308,7 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
 
         Column(
             modifier = Modifier
-                .height(560.dp)
+                .height(530.dp)
                 .fillMaxWidth(0.9f)
                 .clip(shape = RoundedCornerShape(25.dp))
                 .shadow(elevation = 4.dp)
@@ -358,10 +363,14 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
                                 stepViewModel.updateCurrentlySelectedDay(x)
                                 scope.launch {
                                     stepViewModel.updateGraphPointData(stepsRepo?.generateGraphPoints(LocalDate.now().minusDays(LocalDate.now().dayOfWeek.value.toLong()).plusDays(x + 1.toLong()))!!)
+                                    stepViewModel.updateSelectedDaySteps(stepsRepo?.loadTodaySteps(
+                                        LocalDate.now().minusDays(LocalDate.now().dayOfWeek.value.toLong()).plusDays(x+1.toLong())
+                                    )!!)
+                                    delay(1000L)
                                     stepViewModel.initLineChart(
                                         bgColor = bgColor,
                                         textColor = textColor,
-                                        dayStepCount = stepCount
+                                        dayStepCount = selectedDaySteps
                                     )
                                 }
                                 Toast.makeText(context, LocalDate.now().minusDays(LocalDate.now().dayOfWeek.value.toLong()).plusDays(x + 1.toLong()).toString(), Toast.LENGTH_SHORT).show()
@@ -384,15 +393,30 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
             }
             
             Spacer(modifier = Modifier.height(12.dp))
-            
-            Text(
-                text = "$stepWeekStreak day Streak!",
-                textAlign = TextAlign.Start,
-                fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                color = MaterialTheme.colorScheme.onBackground,
+
+            Row(
                 modifier = Modifier
-                    .offset(x = (15).dp)
-            )
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+
+            ) {
+                Text(
+                    text = "$stepWeekStreak day Streak!",
+                    textAlign = TextAlign.Start,
+                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier
+                        .offset(x = (15).dp)
+                )
+                Text(
+                    text = if (currentlySelectedDate == LocalDate.now().dayOfWeek.value - 1) "$stepCount" else "$selectedDaySteps",
+                    textAlign = TextAlign.Start,
+                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                    color = MaterialTheme.colorScheme.onSecondary,
+                    modifier = Modifier
+                        .offset(x = (-15).dp)
+                )
+            }
 
             Spacer(modifier = Modifier.height(40.dp))
 

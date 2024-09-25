@@ -1,6 +1,7 @@
 package com.jaycefr.gain.steps.serivces
 
 import android.annotation.SuppressLint
+import android.app.PendingIntent
 import android.content.Intent
 import android.os.IBinder
 import android.app.Service
@@ -12,6 +13,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.glance.appwidget.updateAll
 import androidx.room.Room
+import com.jaycefr.gain.MainActivity
 import com.jaycefr.gain.R
 import com.jaycefr.gain.steps.link.GifState
 import com.jaycefr.gain.steps.models.StepAppDatabase
@@ -35,6 +37,10 @@ class StepForegroundService : Service() {
         return null
     }
 
+    companion object{
+        private const val PENDING_INTENT_ID = 0x1
+    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when(intent?.action){
             Actions.START.toString() -> start()
@@ -42,13 +48,25 @@ class StepForegroundService : Service() {
         }
         return START_STICKY
     }
+
+    private val launchApplicationPendingIntent
+        get(): PendingIntent{
+            val intent = Intent(applicationContext, MainActivity::class.java)
+            val flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            return PendingIntent.getActivity(this, PENDING_INTENT_ID, intent, flags)
+        }
     
     @SuppressLint("ForegroundServiceType")
     private fun start(){
         val notification = NotificationCompat.Builder(this, "running_channel")
+            .setContentIntent(launchApplicationPendingIntent)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle("Gain")
             .setSubText("Tracking Steps")
+            .setOnlyAlertOnce(true)
+            .setOngoing(true)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setSilent(true)
             .build()
         startForeground(1, notification)
 
