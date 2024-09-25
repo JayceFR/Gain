@@ -141,11 +141,14 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
 
         stepViewModel.updateStepWeekList(weekHistory)
         stepViewModel.updateStepWeekStreak(streak)
-        stepViewModel.updateGraphPointData(stepsRepo?.generateGraphPoints(LocalDate.now().minusDays(1))!!)
+        stepViewModel.updateGraphPointData(stepsRepo?.generateGraphPoints(LocalDate.now().minusDays(0))!!)
     }
 
     if (graphPointData.size > 0){
-        stepViewModel.initLineChart()
+        stepViewModel.initLineChart(
+            axisLabelColor = MaterialTheme.colorScheme.primaryContainer,
+            textColor = MaterialTheme.colorScheme.onBackground
+        )
         println("I am here")
     }
 

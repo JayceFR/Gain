@@ -1,5 +1,8 @@
 package com.jaycefr.gain.steps.link
 
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
@@ -11,6 +14,7 @@ import co.yml.charts.ui.linechart.model.Line
 import co.yml.charts.ui.linechart.model.LineChartData
 import co.yml.charts.ui.linechart.model.LinePlotData
 import co.yml.charts.ui.linechart.model.LineStyle
+import co.yml.charts.ui.linechart.model.LineType
 import co.yml.charts.ui.linechart.model.SelectionHighlightPoint
 import co.yml.charts.ui.linechart.model.SelectionHighlightPopUp
 import co.yml.charts.ui.linechart.model.ShadowUnderLine
@@ -71,21 +75,26 @@ class StepViewModel() : ViewModel() {
         _graphPointData.value = data
     }
 
-    fun initLineChart(){
+
+    fun initLineChart(axisLabelColor : Color, textColor : Color){
         val xAxisData = AxisData.Builder()
             .axisStepSize(20.dp)
-            .backgroundColor(Color.Blue)
+            .backgroundColor(Color.Transparent)
             .steps(6)
             .labelData { i -> i.toString() }
             .labelAndAxisLinePadding(15.dp)
+            .axisLineColor(textColor.copy(alpha = 0.5f))
+            .axisLabelColor(textColor)
             .build()
 
         val steps = 5
 
         val yAxisData = AxisData.Builder()
             .steps(steps)
-            .backgroundColor(Color.Red)
+            .backgroundColor(Color.Transparent)
             .labelAndAxisLinePadding(20.dp)
+            .axisLineColor(textColor.copy(alpha = 0.5f))
+            .axisLabelColor(textColor)
             .labelData { i ->
                 val yScale = 100 / steps
                 (i * yScale).toString()
@@ -96,18 +105,31 @@ class StepViewModel() : ViewModel() {
                 lines = listOf(
                     Line(
                         dataPoints = _graphPointData.value,
-                        LineStyle(),
+                        LineStyle(
+                            color = textColor,
+                            lineType = LineType.SmoothCurve(isDotted = false)
+                        ),
                         IntersectionPoint(),
                         SelectionHighlightPoint(),
-                        ShadowUnderLine(),
+                        ShadowUnderLine(
+                            alpha = 0.5f,
+                            brush = Brush.linearGradient(
+                                colors = listOf(
+                                    Color.Magenta.copy(alpha = 0.5f),
+                                    Color.Transparent
+                                )
+                            )
+                        ),
                         SelectionHighlightPopUp()
                     )
                 ),
             ),
             xAxisData = xAxisData,
             yAxisData = yAxisData,
-            gridLines = GridLines(),
-            backgroundColor = Color.White
+            gridLines = GridLines(
+                color = Color.Transparent
+            ),
+            backgroundColor = axisLabelColor
         )
     }
 
