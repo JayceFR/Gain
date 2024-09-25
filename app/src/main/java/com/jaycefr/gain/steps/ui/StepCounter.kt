@@ -149,7 +149,6 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
             axisLabelColor = MaterialTheme.colorScheme.primaryContainer,
             textColor = MaterialTheme.colorScheme.onBackground
         )
-        println("I am here")
     }
 
     val gifloader = ImageLoader.Builder(LocalContext.current)

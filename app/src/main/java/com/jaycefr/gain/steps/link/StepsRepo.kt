@@ -54,21 +54,33 @@ class StepsRepo (
         val todayAtMidnight = (LocalDateTime.of(date, LocalTime.MIDNIGHT).toString())
         val todayDataPoints = stepsDao.loadAllStepsFromToday(todayAtMidnight)
 
-        var previousValue : Long = 0;
+        val mp = hashMapOf<Int, MutableList<Long>>()
 
         for (x in todayDataPoints.indices){
-            if (todayDataPoints[x].steps > previousValue){
-                pointList.add(
-                    Point(
-                        x = Instant.parse(todayDataPoints[x].createdAt).atZone(ZoneId.systemDefault()).hour.toFloat(),
-                        y = todayDataPoints[x].steps.toFloat()
-                    )
-                )
-
-//                yAxisData.add(todayDataPoints[x].steps)
-//                xAxisData.add(Instant.parse(todayDataPoints[x].createdAt).atZone(ZoneId.systemDefault()).hour)
-                previousValue = todayDataPoints[x].steps
+            val px = Instant.parse(todayDataPoints[x].createdAt).atZone(ZoneId.systemDefault()).hour
+            val py = todayDataPoints[x].steps
+            if (mp.containsKey(px)){
+                //add a check for reboots
+                mp[px]?.add(py);
+            } else{
+                mp[px] = mutableListOf(py);
             }
+            println(Instant.parse(todayDataPoints[x].createdAt).atZone(ZoneId.systemDefault()).hour.toString() + " " + todayDataPoints[x].steps.toString() )
+        }
+
+        for (key in mp.keys.sorted()){
+            var steps : Long = 0;
+            for (x in mp[key]!!.size - 1 downTo 1){
+                if (mp[key]!![x] > mp[key]!![x-1]){
+                    steps += mp[key]!![x] - mp[key]!![x-1]
+                }
+            }
+            pointList.add(
+                Point(
+                    x = key.toFloat(),
+                    y = steps.toFloat()
+                )
+            )
         }
 
         pointList
