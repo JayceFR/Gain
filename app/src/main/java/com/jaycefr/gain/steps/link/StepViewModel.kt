@@ -76,10 +76,10 @@ class StepViewModel() : ViewModel() {
     }
 
 
-    fun initLineChart(axisLabelColor : Color, textColor : Color){
+    fun initLineChart(bgColor : Color, textColor : Color, dayStepCount : Long){
         val xAxisData = AxisData.Builder()
             .axisStepSize(50.dp)
-            .backgroundColor(Color.Transparent)
+            .backgroundColor(bgColor)
             .steps(_graphPointData.value.size)
             .labelData { i -> i.toString() }
             .labelAndAxisLinePadding(15.dp)
@@ -91,12 +91,12 @@ class StepViewModel() : ViewModel() {
 
         val yAxisData = AxisData.Builder()
             .steps(steps)
-            .backgroundColor(Color.Transparent)
+            .backgroundColor(bgColor)
             .labelAndAxisLinePadding(20.dp)
             .axisLineColor(textColor.copy(alpha = 0.5f))
             .axisLabelColor(textColor)
             .labelData { i ->
-                val yScale = 100 / steps
+                val yScale = dayStepCount / steps
                 (i * yScale).toString()
             }.build()
 
@@ -109,14 +109,16 @@ class StepViewModel() : ViewModel() {
                             color = textColor,
                             lineType = LineType.SmoothCurve(isDotted = false)
                         ),
-                        IntersectionPoint(),
+                        IntersectionPoint(
+                            color = Color.Transparent
+                        ),
                         SelectionHighlightPoint(),
                         ShadowUnderLine(
                             alpha = 0.5f,
                             brush = Brush.linearGradient(
                                 colors = listOf(
-                                    Color.Magenta.copy(alpha = 0.5f),
-                                    Color.Transparent
+                                    Color.Magenta,
+                                    bgColor
                                 )
                             )
                         ),
@@ -124,12 +126,15 @@ class StepViewModel() : ViewModel() {
                     )
                 ),
             ),
+            isZoomAllowed = false,
             xAxisData = xAxisData,
             yAxisData = yAxisData,
-            gridLines = GridLines(
-                color = Color.Transparent
-            ),
-            backgroundColor = axisLabelColor
+            gridLines = null,
+            paddingTop = 10.dp,
+            paddingRight = 0.dp,
+            containerPaddingEnd = 0.dp,
+            bottomPadding = 0.dp,
+            backgroundColor = Color.Transparent
         )
     }
 

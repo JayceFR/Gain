@@ -146,8 +146,9 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
 
     if (graphPointData.size > 0){
         stepViewModel.initLineChart(
-            axisLabelColor = MaterialTheme.colorScheme.primaryContainer,
-            textColor = MaterialTheme.colorScheme.onBackground
+            bgColor = MaterialTheme.colorScheme.primaryContainer,
+            textColor = MaterialTheme.colorScheme.onBackground,
+            dayStepCount = stepCount
         )
     }
 
@@ -306,7 +307,7 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
 
         Column(
             modifier = Modifier
-                .height(250.dp)
+                .height(560.dp)
                 .fillMaxWidth(0.9f)
                 .clip(shape = RoundedCornerShape(25.dp))
                 .shadow(elevation = 4.dp)
@@ -387,16 +388,28 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
                 modifier = Modifier
                     .offset(x = (15).dp)
             )
-        }
-        
-        Spacer(modifier = Modifier.height(40.dp))
-        lineCharData?.let {
-            LineChart(
+
+            Spacer(modifier = Modifier.height(40.dp))
+
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(300.dp),
-                lineChartData = it
-            )
+                horizontalAlignment = Alignment.CenterHorizontally
+
+            ) {
+                lineCharData?.let {
+                    LineChart(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.primaryContainer),
+                        lineChartData = it
+                    )
+                }
+            }
+
+
+
         }
 
         Button(onClick = { requestPermission.launch(declined_permissions) }) {
