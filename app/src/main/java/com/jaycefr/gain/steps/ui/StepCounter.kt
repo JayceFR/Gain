@@ -33,6 +33,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -73,6 +74,8 @@ import com.jaycefr.gain.steps.link.StepViewModelLinker
 import com.jaycefr.gain.steps.link.StepsRepo
 import com.jaycefr.gain.steps.utils.NormalText
 import com.jaycefr.gain.steps.utils.getDecimalPlace
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
 import kotlin.math.min
@@ -103,19 +106,10 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
 
     val gifState by stepViewModel.gifState.collectAsState()
 
+    val bgColor : Color = MaterialTheme.colorScheme.primaryContainer
+    val textColor : Color = MaterialTheme.colorScheme.onBackground
+
     val days = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-
-    var colors = mutableListOf<Color>()
-
-    if (!isSystemInDarkTheme()){
-        colors = mutableListOf(
-            Color(150, 200, 215, 100),
-            Color(175, 215, 225, 100),
-            Color(190, 235, 250, 100))
-    }
-    else{
-        colors = mutableListOf(Color(27, 54, 66, 100), Color(42, 69, 75, 100), Color(41, 72, 97, 100))
-    }
 
     val context : Context = LocalContext.current
     LaunchedEffect(context) {
@@ -144,10 +138,10 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
         stepViewModel.updateGraphPointData(stepsRepo?.generateGraphPoints(LocalDate.now().minusDays(0))!!)
     }
 
-    if (graphPointData.size > 0){
+    if (graphPointData.size > 0 && lineCharData == null){
         stepViewModel.initLineChart(
-            bgColor = MaterialTheme.colorScheme.primaryContainer,
-            textColor = MaterialTheme.colorScheme.onBackground,
+            bgColor = bgColor,
+            textColor = textColor,
             dayStepCount = stepCount
         )
     }
@@ -183,6 +177,8 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
         })
     //Handling permissions
     val declined_permissions = permissionViewModel.permission_health_checker(LocalContext.current)
+
+    val scope = rememberCoroutineScope()
 
     Column (
         modifier = Modifier
@@ -360,7 +356,16 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
                         modifier = Modifier
                             .clickable {
                                 stepViewModel.updateCurrentlySelectedDay(x)
-                                Toast.makeText(context, "Clicked $x", Toast.LENGTH_SHORT).show()
+                                scope.launch {
+                                    stepViewModel.updateGraphPointData(stepsRepo?.generateGraphPoints(LocalDate.now().minusDays(LocalDate.now().dayOfWeek.value.toLong()).plusDays(x + 1.toLong()))!!)
+                                    stepViewModel.initLineChart(
+                                        bgColor = bgColor,
+                                        textColor = textColor,
+                                        dayStepCount = stepCount
+                                    )
+                                }
+                                Toast.makeText(context, LocalDate.now().minusDays(LocalDate.now().dayOfWeek.value.toLong()).plusDays(x + 1.toLong()).toString(), Toast.LENGTH_SHORT).show()
+//                                Toast.makeText(context, "Clicked $x", Toast.LENGTH_SHORT).show()
                             }
                     ) {
                         NormalText(

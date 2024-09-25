@@ -80,7 +80,7 @@ class StepViewModel() : ViewModel() {
         val xAxisData = AxisData.Builder()
             .axisStepSize(50.dp)
             .backgroundColor(bgColor)
-            .steps(_graphPointData.value.size)
+            .steps(24)
             .labelData { i -> i.toString() }
             .labelAndAxisLinePadding(15.dp)
             .axisLineColor(textColor.copy(alpha = 0.5f))
