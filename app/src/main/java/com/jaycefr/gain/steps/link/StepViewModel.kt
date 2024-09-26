@@ -2,10 +2,13 @@ package com.jaycefr.gain.steps.link
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import co.yml.charts.axis.AxisData
 import co.yml.charts.common.model.Point
 import co.yml.charts.ui.linechart.model.GridLines
@@ -20,19 +23,20 @@ import co.yml.charts.ui.linechart.model.SelectionHighlightPopUp
 import co.yml.charts.ui.linechart.model.ShadowUnderLine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 class StepViewModel() : ViewModel() {
 //    var stepCount by mutableLongStateOf(0L)
-    private val serviceScope = CoroutineScope(Dispatchers.IO)
 
-    private var stepViewModelLinker = StepViewModelLinker(serviceScope)
+    private var stepViewModelLinker = StepViewModelLinker(viewModelScope)
 
-    val stepCount : StateFlow<Long> get() = stepViewModelLinker.stepCount
+    val stepCount : MutableStateFlow<Long> get() = stepViewModelLinker.stepCount
 
-    val stepPercentage : StateFlow<Float> get() = stepViewModelLinker.stepPercentage
+    val stepPercentage : MutableStateFlow<Float> get() = stepViewModelLinker.stepPercentage
 
     val stepGoal : StateFlow<Long> get() = stepViewModelLinker.stepGoal
 
@@ -61,6 +65,13 @@ class StepViewModel() : ViewModel() {
 
     init {
         _currentlySelectedDay.value = LocalDate.now().dayOfWeek.value - 1
+//        stepViewModelLinker.startCollectingStepUpdates()
+    }
+
+    suspend fun updateStepCount(count : Flow<Long>){
+        viewModelScope.launch {
+            stepViewModelLinker.updateStepCount(count)
+        }
     }
 
     fun updateLastUpdate(update: String){

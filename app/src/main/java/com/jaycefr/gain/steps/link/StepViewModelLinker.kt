@@ -7,13 +7,17 @@ import com.jaycefr.gain.steps.models.StepAppDatabase
 import com.jaycefr.gain.steps.models.usecase.StepUseCase
 import com.jaycefr.gain.steps.serivces.StepCounterEvent
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import kotlin.coroutines.coroutineContext
 
@@ -26,7 +30,7 @@ class StepViewModelLinker(
     private val _stepPercentage = MutableStateFlow(0f)
     val stepPercentage : MutableStateFlow<Float> get() = _stepPercentage
 
-    private val _stepGoal = MutableStateFlow(300L)
+    private val _stepGoal = MutableStateFlow(900L)
     val stepGoal : MutableStateFlow<Long> get() = _stepGoal
 
     private val _gifState = MutableStateFlow(GifState.Standing)
@@ -60,8 +64,21 @@ class StepViewModelLinker(
         }.launchIn(coroutineScope)
     }
 
+    suspend fun updateStepCount(count : Flow<Long>){
+        println("Updating the ui")
+        count.collect{
+                value -> _stepCount.value = value
+                _stepPercentage.value = (value.toFloat() / _stepGoal.value.toFloat())
+                println("collected step count : $value")
+        }
+    }
+
+
     fun onStepCountChanged(newStepCount : Long, eventDate : LocalDate){
         rawStepSensorReading.value = StepCounterEvent(newStepCount, eventDate)
+        coroutineScope.launch {
+            updateStepCount(stepsRepo.getTodaySteps())
+        }
     }
 
 

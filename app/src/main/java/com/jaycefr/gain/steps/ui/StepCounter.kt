@@ -121,6 +121,7 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
         ).build()
 
         stepsRepo = StepsRepo(db!!.stepsDao())
+        stepViewModel.updateStepCount(stepsRepo?.getTodaySteps()!!)
 
 //        stepViewModel.updateLastUpdate(stepsRepo!!.getLastStepUpdate())
 //        StepViewModelLinker.updateStepCount(stepsRepo!!.loadTodaySteps())
@@ -139,7 +140,6 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
 //        stepViewModel.updateStepWeekStreak(streak)
 //        stepViewModel.updateGraphPointData(stepsRepo?.generateGraphPoints(LocalDate.now().minusDays(0))!!)
 
-        stepViewModel.updateSelectedDaySteps(stepCount)
 
     }
 
@@ -185,6 +185,10 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
 
     val scope = rememberCoroutineScope()
 
+    LaunchedEffect(stepCount) {
+        println("step count changed")
+    }
+
     Column (
         modifier = Modifier
             .fillMaxSize()
@@ -193,6 +197,21 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
     ) {
 
         Spacer(modifier = Modifier.height(90.dp))
+
+        Button(
+            onClick = {
+                scope.launch {
+                    stepViewModel.updateStepCount(stepsRepo?.getTodaySteps()!!)
+                }
+            }
+        ) {
+            Text(
+                text = "update",
+                color = MaterialTheme.colorScheme.onBackground,
+                fontSize = MaterialTheme.typography.titleMedium.fontSize
+
+            )
+        }
 
         CircularProgressBar(percentage = stepPercentage, number = stepCount)
 

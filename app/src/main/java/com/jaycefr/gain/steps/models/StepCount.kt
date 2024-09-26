@@ -11,6 +11,7 @@ import androidx.room.Query
 import androidx.room.RoomDatabase
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
 
 @Entity(tableName = "steps")
 data class StepCount(
@@ -26,8 +27,8 @@ interface StepsDao {
     @Query("Select * from steps where date = :date")
     fun getDay(date : String) : Flow<StepCount>
 
-    @Query("Select * from steps where date = :date")
-    suspend fun loadAllStepsFromToday(date : String) : Array<StepCount>
+    @Query("Select steps from steps where date = :date")
+    fun getTodaySteps(date : String = LocalDate.now().toString()) : Flow<Long>
 
     @Upsert
     suspend fun upsert(vararg steps: StepCount)

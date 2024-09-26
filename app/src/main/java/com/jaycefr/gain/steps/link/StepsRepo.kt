@@ -32,6 +32,11 @@ class StepsRepo (
         day
     }
 
+    suspend fun getTodaySteps() : Flow<Long> = withContext(Dispatchers.IO){
+        val steps = stepsDao.getTodaySteps()
+        steps
+    }
+
     suspend fun upsertDay(stepCount: StepCount) = withContext(Dispatchers.IO){
         stepsDao.upsert(stepCount)
     }
