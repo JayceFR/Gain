@@ -9,12 +9,13 @@ import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.RoomDatabase
+import androidx.room.Upsert
+import kotlinx.coroutines.flow.Flow
 
 @Entity(tableName = "steps")
 data class StepCount(
+    @PrimaryKey val date : String,
     @ColumnInfo(name = "steps") val steps : Long,
-    @ColumnInfo(name = "created_at") val createdAt : String,
-    @PrimaryKey(autoGenerate = true) val id : Int = 0
 )
 
 @Dao
@@ -22,11 +23,14 @@ interface StepsDao {
     @Query("Select * from steps")
     suspend fun getAll(): List<StepCount>
 
-    @Query("Select * from steps where created_at >= date(:startDateTime)" + " And created_at < date(:startDateTime, '+1 day')")
-    suspend fun loadAllStepsFromToday(startDateTime : String) : Array<StepCount>
+    @Query("Select * from steps where date = :date")
+    fun getDay(date : String) : Flow<StepCount>
 
-    @Insert
-    suspend fun insertAll(vararg steps: StepCount)
+    @Query("Select * from steps where date = :date")
+    suspend fun loadAllStepsFromToday(date : String) : Array<StepCount>
+
+    @Upsert
+    suspend fun upsert(vararg steps: StepCount)
 
     @Delete
     suspend fun delete(steps: StepCount)

@@ -18,7 +18,7 @@ val stepreading = MutableStateFlow(0)
 
 fun main(){
 //    println(Instant.parse(Instant.now().toString()).atZone(ZoneId.systemDefault()).hour)
-    stepreading.drop(1).onEach { event -> println(event) }
-    println(LocalDate.MIN.toString())
+    println( LocalDate.now().toString())
+    var date : LocalDate = LocalDate.parse(LocalDate.now().toString())
 
 }

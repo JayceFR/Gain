@@ -16,20 +16,22 @@ import androidx.room.Room
 import com.jaycefr.gain.MainActivity
 import com.jaycefr.gain.R
 import com.jaycefr.gain.steps.link.GifState
+import com.jaycefr.gain.steps.link.StepViewModel
 import com.jaycefr.gain.steps.models.StepAppDatabase
 import com.jaycefr.gain.steps.link.StepViewModelLinker
 import com.jaycefr.gain.steps.link.StepsRepo
+import com.jaycefr.gain.steps.models.usecase.StepUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 class StepForegroundService : Service() {
 
     private lateinit var sensorManager: SensorManager
+    private lateinit var stepViewModelLinker : StepViewModelLinker
     private var stepCounterSensor: Sensor? = null
-    private lateinit var db : StepAppDatabase
-    private lateinit var stepsRepo: StepsRepo
     private val serviceJob = Job()
     private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
 
@@ -78,11 +80,12 @@ class StepForegroundService : Service() {
                 if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER){
                     val stepCount = event.values[0].toLong()
                     serviceScope.launch {
-                        stepsRepo.storeSteps(stepCount)
+//                        stepsRepo.storeSteps(stepCount)
                         Log.d("Steps", "Storing Steps : $stepCount")
-                        StepViewModelLinker.updateStepCount(stepsRepo.loadTodaySteps())
+//                        StepViewModelLinker.updateStepCount(stepsRepo.loadTodaySteps())
+                        stepViewModelLinker.onStepCountChanged(stepCount, LocalDate.now())
                         //update the gifstate
-                        StepViewModelLinker.updateGifState(GifState.Walking)
+                        stepViewModelLinker.updateGifState(GifState.Walking)
                         //update the widget
                         StepWidget.updateAll(applicationContext)
                     }
@@ -94,12 +97,8 @@ class StepForegroundService : Service() {
             }
         }
 
-        db = Room.databaseBuilder(
-            applicationContext,
-            StepAppDatabase::class.java, "stepdb"
-        ).build()
-
-        stepsRepo = StepsRepo(db.stepsDao())
+        stepViewModelLinker = StepViewModelLinker(serviceScope)
+        stepViewModelLinker.initialize(applicationContext)
 
         sensorManager.registerListener(stepCountListener, stepCounterSensor, SensorManager.SENSOR_DELAY_UI)
 

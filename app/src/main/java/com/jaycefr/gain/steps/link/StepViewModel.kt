@@ -18,18 +18,23 @@ import co.yml.charts.ui.linechart.model.LineType
 import co.yml.charts.ui.linechart.model.SelectionHighlightPoint
 import co.yml.charts.ui.linechart.model.SelectionHighlightPopUp
 import co.yml.charts.ui.linechart.model.ShadowUnderLine
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.time.LocalDate
 
 class StepViewModel() : ViewModel() {
 //    var stepCount by mutableLongStateOf(0L)
+    private val serviceScope = CoroutineScope(Dispatchers.IO)
 
-    val stepCount : StateFlow<Long> get() = StepViewModelLinker.stepCount
+    private var stepViewModelLinker = StepViewModelLinker(serviceScope)
 
-    val stepPercentage : StateFlow<Float> get() = StepViewModelLinker.stepPercentage
+    val stepCount : StateFlow<Long> get() = stepViewModelLinker.stepCount
 
-    val stepGoal : StateFlow<Long> get() = StepViewModelLinker.stepGoal
+    val stepPercentage : StateFlow<Float> get() = stepViewModelLinker.stepPercentage
+
+    val stepGoal : StateFlow<Long> get() = stepViewModelLinker.stepGoal
 
     private val _stepWeekList = MutableStateFlow(mutableListOf<Int>())
     val stepWeekList : StateFlow<MutableList<Int>> get() = _stepWeekList
@@ -52,7 +57,7 @@ class StepViewModel() : ViewModel() {
     private val _lineChartData = MutableStateFlow<LineChartData?>(null)
     val lineChartData : StateFlow<LineChartData?> get() = _lineChartData
 
-    val gifState : StateFlow<GifState> get() = StepViewModelLinker.gifState
+    val gifState : StateFlow<GifState> get() = stepViewModelLinker.gifState
 
     init {
         _currentlySelectedDay.value = LocalDate.now().dayOfWeek.value - 1

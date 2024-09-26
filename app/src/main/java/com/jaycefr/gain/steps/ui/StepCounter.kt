@@ -122,22 +122,22 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
 
         stepsRepo = StepsRepo(db!!.stepsDao())
 
-        stepViewModel.updateLastUpdate(stepsRepo!!.getLastStepUpdate())
-        StepViewModelLinker.updateStepCount(stepsRepo!!.loadTodaySteps())
+//        stepViewModel.updateLastUpdate(stepsRepo!!.getLastStepUpdate())
+//        StepViewModelLinker.updateStepCount(stepsRepo!!.loadTodaySteps())
 
-        val last_update = Instant.parse(lastUpdate)
-        val current_time = Instant.now().minusSeconds(300)
-        if (last_update.isBefore(current_time)){
-            StepViewModelLinker.updateGifState(GifState.Standing)
-        } else{
-            StepViewModelLinker.updateGifState(GifState.Walking)
-        }
+//        val last_update = Instant.parse(lastUpdate)
+//        val current_time = Instant.now().minusSeconds(300)
+//        if (last_update.isBefore(current_time)){
+//            StepViewModelLinker.updateGifState(GifState.Standing)
+//        } else{
+//            StepViewModelLinker.updateGifState(GifState.Walking)
+//        }
 
-        val (weekHistory, streak) = stepsRepo?.loadWeeklyHistory()!!
+//        val (weekHistory, streak) = stepsRepo?.loadWeeklyHistory()!!
 
-        stepViewModel.updateStepWeekList(weekHistory)
-        stepViewModel.updateStepWeekStreak(streak)
-        stepViewModel.updateGraphPointData(stepsRepo?.generateGraphPoints(LocalDate.now().minusDays(0))!!)
+//        stepViewModel.updateStepWeekList(weekHistory)
+//        stepViewModel.updateStepWeekStreak(streak)
+//        stepViewModel.updateGraphPointData(stepsRepo?.generateGraphPoints(LocalDate.now().minusDays(0))!!)
 
         stepViewModel.updateSelectedDaySteps(stepCount)
 
@@ -349,48 +349,48 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                for(x in 0..<stepWeekList.value.size){
-                    Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .clickable {
-                                stepViewModel.updateCurrentlySelectedDay(x)
-                                scope.launch {
-                                    stepViewModel.updateGraphPointData(stepsRepo?.generateGraphPoints(LocalDate.now().minusDays(LocalDate.now().dayOfWeek.value.toLong()).plusDays(x + 1.toLong()))!!)
-                                    stepViewModel.updateSelectedDaySteps(stepsRepo?.loadTodaySteps(
-                                        LocalDate.now().minusDays(LocalDate.now().dayOfWeek.value.toLong()).plusDays(x+1.toLong())
-                                    )!!)
-                                    delay(1000L)
-                                    stepViewModel.initLineChart(
-                                        bgColor = bgColor,
-                                        textColor = textColor,
-                                        dayStepCount = selectedDaySteps
-                                    )
-                                }
-                                Toast.makeText(context, LocalDate.now().minusDays(LocalDate.now().dayOfWeek.value.toLong()).plusDays(x + 1.toLong()).toString(), Toast.LENGTH_SHORT).show()
-//                                Toast.makeText(context, "Clicked $x", Toast.LENGTH_SHORT).show()
-                            }
-                    ) {
-                        NormalText(
-                            text = days[x],
-                            color = if (currentlySelectedDate == x) Color.Magenta else MaterialTheme.colorScheme.onBackground
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        day(
-                            text = LocalDate.now().minusDays(LocalDate.now().dayOfWeek.value.toLong()).plusDays(
-                            (x+1).toLong()).toString().split("-")[2],
-                            color = if (stepWeekList.value[x] == 1) Color.Green.copy(alpha = 0.6f) else Color.Red.copy(alpha = 0.6f)
-                        )
-                    }
-                }
-
-            }
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth(),
+//                horizontalArrangement = Arrangement.SpaceEvenly
+//            ) {
+//                for(x in 0..<stepWeekList.value.size){
+//                    Column(
+//                        verticalArrangement = Arrangement.Center,
+//                        horizontalAlignment = Alignment.CenterHorizontally,
+//                        modifier = Modifier
+//                            .clickable {
+//                                stepViewModel.updateCurrentlySelectedDay(x)
+//                                scope.launch {
+//                                    stepViewModel.updateGraphPointData(stepsRepo?.generateGraphPoints(LocalDate.now().minusDays(LocalDate.now().dayOfWeek.value.toLong()).plusDays(x + 1.toLong()))!!)
+//                                    stepViewModel.updateSelectedDaySteps(stepsRepo?.loadTodaySteps(
+//                                        LocalDate.now().minusDays(LocalDate.now().dayOfWeek.value.toLong()).plusDays(x+1.toLong())
+//                                    )!!)
+//                                    delay(1000L)
+//                                    stepViewModel.initLineChart(
+//                                        bgColor = bgColor,
+//                                        textColor = textColor,
+//                                        dayStepCount = selectedDaySteps
+//                                    )
+//                                }
+//                                Toast.makeText(context, LocalDate.now().minusDays(LocalDate.now().dayOfWeek.value.toLong()).plusDays(x + 1.toLong()).toString(), Toast.LENGTH_SHORT).show()
+////                                Toast.makeText(context, "Clicked $x", Toast.LENGTH_SHORT).show()
+//                            }
+//                    ) {
+//                        NormalText(
+//                            text = days[x],
+//                            color = if (currentlySelectedDate == x) Color.Magenta else MaterialTheme.colorScheme.onBackground
+//                        )
+//                        Spacer(modifier = Modifier.height(12.dp))
+//                        day(
+//                            text = LocalDate.now().minusDays(LocalDate.now().dayOfWeek.value.toLong()).plusDays(
+//                            (x+1).toLong()).toString().split("-")[2],
+//                            color = if (stepWeekList.value[x] == 1) Color.Green.copy(alpha = 0.6f) else Color.Red.copy(alpha = 0.6f)
+//                        )
+//                    }
+//                }
+//
+//            }
             
             Spacer(modifier = Modifier.height(12.dp))
 

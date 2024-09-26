@@ -23,7 +23,8 @@ object StepWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val stepCount = runBlocking {
-            StepViewModelLinker.stepCount.value
+            0.toLong()
+//            StepViewModelLinker.stepCount.value
         }
         provideContent {
             MyContent(stepCount)
