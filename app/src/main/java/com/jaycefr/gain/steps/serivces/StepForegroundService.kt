@@ -84,6 +84,7 @@ class StepForegroundService : Service() {
                         Log.d("Steps", "Storing Steps : $stepCount")
 //                        StepViewModelLinker.updateStepCount(stepsRepo.loadTodaySteps())
                         stepViewModelLinker.onStepCountChanged(stepCount, LocalDate.now())
+                        stepViewModelLinker.loadTodaySteps()
                         //update the gifstate
                         stepViewModelLinker.updateGifState(GifState.Walking)
                         //update the widget

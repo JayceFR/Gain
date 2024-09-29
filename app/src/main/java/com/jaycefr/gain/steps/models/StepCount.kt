@@ -25,7 +25,7 @@ interface StepsDao {
     suspend fun getAll(): List<StepCount>
 
     @Query("Select * from steps where date = :date")
-    fun getDay(date : String) : Flow<StepCount>
+    fun getDay(date : String) : Flow<StepCount?>
 
     @Query("Select steps from steps where date = :date")
     fun getTodaySteps(date : String = LocalDate.now().toString()) : Flow<Long>

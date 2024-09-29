@@ -97,6 +97,8 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
     val stepGoal by stepViewModel.stepGoal.collectAsState()
     val stepWeekStreak by stepViewModel.stepWeekStreak.collectAsState()
 
+    val state by stepViewModel.stats.collectAsState()
+
     val currentlySelectedDate by stepViewModel.currentlySelectedDay.collectAsState()
     val selectedDaySteps by stepViewModel.selectedDaySteps.collectAsState()
 
@@ -197,6 +199,10 @@ fun StepCounterScreen(stepViewModel: StepViewModel)
     ) {
 
         Spacer(modifier = Modifier.height(90.dp))
+
+        Text(
+            text = "${state.steps}"
+        )
 
         Button(
             onClick = {

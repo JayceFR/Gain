@@ -21,6 +21,7 @@ import co.yml.charts.ui.linechart.model.LineType
 import co.yml.charts.ui.linechart.model.SelectionHighlightPoint
 import co.yml.charts.ui.linechart.model.SelectionHighlightPopUp
 import co.yml.charts.ui.linechart.model.ShadowUnderLine
+import com.jaycefr.gain.steps.serivces.StepCounterState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -37,6 +38,8 @@ class StepViewModel() : ViewModel() {
     val stepCount : MutableStateFlow<Long> get() = stepViewModelLinker.stepCount
 
     val stepPercentage : MutableStateFlow<Float> get() = stepViewModelLinker.stepPercentage
+
+    val stats : StateFlow<StepCounterState> get() = stepViewModelLinker.stats
 
     val stepGoal : StateFlow<Long> get() = stepViewModelLinker.stepGoal
 

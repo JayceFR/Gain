@@ -6,12 +6,15 @@ import androidx.room.Room
 import com.jaycefr.gain.steps.models.StepAppDatabase
 import com.jaycefr.gain.steps.models.usecase.StepUseCase
 import com.jaycefr.gain.steps.serivces.StepCounterEvent
+import com.jaycefr.gain.steps.serivces.StepCounterState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
@@ -42,6 +45,11 @@ class StepViewModelLinker(
     private lateinit var db : StepAppDatabase
     private lateinit var stepsRepo : StepsRepo
     private lateinit var stepUseCase : StepUseCase
+
+    private var getStatsJob : Job? = null
+
+    private val _stats = MutableStateFlow(StepCounterState(LocalDate.now(), 0, 5000))
+    val stats : StateFlow<StepCounterState> get() = _stats
 
 
     fun initialize(context : Context){
@@ -78,6 +86,30 @@ class StepViewModelLinker(
         rawStepSensorReading.value = StepCounterEvent(newStepCount, eventDate)
         coroutineScope.launch {
             updateStepCount(stepsRepo.getTodaySteps())
+        }
+        getStats()
+    }
+
+    fun getStats(){
+        getStatsJob?.cancel()
+        getStatsJob = stepUseCase.getDay(LocalDate.now()).onEach {
+            day ->
+            _stats.value = day.run {
+                StepCounterState(
+                    date = LocalDate.parse(date),
+                    steps = steps,
+                    goal = 5000
+                )
+            }
+        }.launchIn(coroutineScope)
+    }
+
+    fun loadTodaySteps(){
+        coroutineScope.launch {
+            stepsRepo.getTodaySteps().collect{
+                stepCount ->
+                _stepCount.value = stepCount
+            }
         }
     }
 

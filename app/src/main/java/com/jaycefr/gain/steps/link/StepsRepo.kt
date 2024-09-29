@@ -27,9 +27,9 @@ class StepsRepo (
         stepsDao.upsert(stepCount)
     }
 
-    suspend fun getDay() : Flow<StepCount?> = withContext(Dispatchers.IO){
+    fun getDay() : Flow<StepCount?>{
         val day = stepsDao.getDay(LocalDate.now().toString())
-        day
+        return day
     }
 
     suspend fun getTodaySteps() : Flow<Long> = withContext(Dispatchers.IO){
