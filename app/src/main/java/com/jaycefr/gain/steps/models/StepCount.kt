@@ -28,7 +28,7 @@ interface StepsDao {
     fun getDay(date : String) : Flow<StepCount?>
 
     @Query("Select steps from steps where date = :date")
-    fun getTodaySteps(date : String = LocalDate.now().toString()) : Flow<Long>
+    fun getTodaySteps(date : String = LocalDate.now().toString()) : Flow<Long?>
 
     @Upsert
     suspend fun upsert(vararg steps: StepCount)

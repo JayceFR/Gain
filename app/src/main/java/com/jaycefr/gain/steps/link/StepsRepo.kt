@@ -8,6 +8,7 @@ import com.jaycefr.gain.steps.models.WeekStep
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.LocalDate
@@ -33,7 +34,9 @@ class StepsRepo (
     }
 
     suspend fun getTodaySteps() : Flow<Long> = withContext(Dispatchers.IO){
-        val steps = stepsDao.getTodaySteps()
+        val steps = stepsDao.getTodaySteps().map {
+            it ?: 0L
+        }
         steps
     }
 
